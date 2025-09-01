@@ -1,0 +1,9 @@
+node_modules/  
+.vscode/
+package-lock.json  
+*.map
+*.log
+*.cache
+*.code-workspace 
+*.css.map
+*.config.mjs
