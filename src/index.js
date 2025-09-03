@@ -1,18 +1,22 @@
-const express = require("express");
-const app = express();
-const port = 3000;
-const route = require("./routes/route.js");
+require('dotenv').config();
+const express = require('express')
+const app = express()
+
+const port = 3000
+
+const users = require('./routes/users.js')
+const auth = require('./routes/auth.js')
 
 // Setup Middleware
-app.use(express.json());
+app.use(express.json())
 
-app.use("/users", route);
+app.use('/api/v1/users', users)
+app.use('/api/v1/auth', auth)
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
 app.listen(port, () => {
-  console.log(`listening at http://localhost:${port}`);
-});
-
+  console.log(`listening at http://localhost:${port}`)
+})
