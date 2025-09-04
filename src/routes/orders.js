@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const controller = require('../controllers/ordersController.js')
+const ordersController = require('../controllers/ordersController.js')
 
-router.post('/checkout', controller.checkout)
-router.get('/:userId/orders', controller.orders)
+router.post('/checkout', ordersController.checkout)
+router.get('/:id/orders', ordersController.orders)
 
 module.exports = router

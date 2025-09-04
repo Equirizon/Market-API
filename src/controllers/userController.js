@@ -1,29 +1,44 @@
-const db = require("../db/database.js")
 const userModel = require("../models/userModel.js")
 
-function createUser(req, res) {
-  const { name, email } = req.body
-  db.run(userModel.createUser, [name, email], function (err) {
-    if (err) return res.status(400).json({ error: err.message })
-    res.json({ message: "User created successfully", id: this.lastID, name, email })
-  })
+const userController = {
+  async getUsers(req, res) {
+    try {
+      const users = await userModel.getUsers()
+      res.status(200).json(users)
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  },
+
+  async getUserById(req, res) {
+    const userId = req.params.id
+    try {
+      const user = await userModel.getUserById(userId)
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+      res.status(200).json(user)
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  },
+
+  async createUser(req, res) {
+    const { name, email } = req.body
+    try {
+      if (!name || !email) {
+        return res.status(400).json({ error: 'Name and email are required' })
+      }
+      const existingUser = await userModel.getUserByEmail(email)
+      if (existingUser) {
+        return res.status(409).json({ error: 'Email already exists' })
+      }
+      const newUser = await userModel.createUser(name, email)
+      res.status(201).json(newUser)
+    } catch (err) {
+      res.status(500).json({ error: err.message })
+    }
+  },
 }
 
-function getUser(req, res) {
-  const { id } = req.params
-  db.get(userModel.getUser, [id], (err, row) => {
-    if (err) return res.status(400).json({ error: err.message })
-    if (!row) return res.status(404).json({ error: "User not found" })
-    res.json(row)
-  })
-}
-
-function getUsers(req, res) {
-  db.all(userModel.getUsers, [], (err, rows) => {
-    if (err) return res.status(400).json({ error: err.message })
-    res.json(rows)
-  })
-}
-
-module.exports = { createUser, getUser, getUsers }
-
+module.exports = userController

@@ -1,27 +1,27 @@
-const db = require("../db/database.js")
+const ordersModel = require('../models/ordersModel.js')
 
-function checkout(req, res) {
-  const { userId, cartItems } = req.body
-  db.run("BEGIN TRANSACTION", [])
-  cartItems.forEach(item => {
-    db.run("INSERT INTO orders (user_id, product_id, quantity) VALUES (?, ?, ?)", [userId, item.productId, item.quantity])
-  })
-  db.run("COMMIT", [], (err) => {
-    if (err) {
-      db.run("ROLLBACK", [])
-      return res.status(400).json({ error: err.message })
+const ordersController = {
+  async checkout(req, res) {
+    const {userId, cartItems} = req.body
+    try {
+      if (!userId || !cartItems || !Array.isArray(cartItems)) {
+        return res.status(400).json({error: 'Invalid request body'})
+      }
+      const result = await ordersModel.checkout(userId, cartItems)
+      res.status(200).json(result)
+    } catch (error) {
+      res.status(500).json({error: error.message})
     }
-    res.status(201).json({ message: "Checkout successful" })
-  })
+  },
+  async orders(req, res) {
+    const userId = req.params.id
+    try {
+      const orders = await ordersModel.orders(userId)
+      res.status(200).json(orders)
+    } catch (error) {
+      res.status(500).json({error: error.message})
+    }
+  },
 }
 
-
-function orders(req, res) {
-  const { userId } = req.params
-  db.all("SELECT * FROM orders WHERE user_id = ?", [userId], (err, rows) => {
-    if (err) return res.status(400).json({ error: err.message })
-    res.json(rows)
-  })
-}
-
-module.exports = { checkout, orders }
+module.exports = ordersController

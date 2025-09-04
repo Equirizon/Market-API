@@ -2,7 +2,7 @@ node_modules/
 .vscode/
 package-lock.json 
 .env
-.env-*
+.env.*
 *.map
 *.log
 *.cache
