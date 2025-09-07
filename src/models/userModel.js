@@ -1,57 +1,71 @@
-const db = require('../db/database.js')
+const knex = require('../db/knex.js')
 
-// Create Users Table
-db.run(
-  `CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);`,
-  (err) => {
-    if (err) {
-      console.error({type: 'error', message: 'Error creating users table: ' + err.message})
-      return
-    }
-    console.info('Users table created or already exists.')
+// Create users table if it doesn't exist
+knex.schema.hasTable('users').then((exists) => {
+  if (!exists) {
+    return knex.schema
+      .createTable('users', function (table) {
+        table.increments('id').primary()
+        table.string('name').notNullable()
+        table.string('email').unique().notNullable()
+        table.timestamp('created_at').defaultTo(knex.fn.now())
+      })
+      .then(() => {
+        console.info('Users table created.')
+      })
+      .catch((err) => {
+        console.error({type: 'error', message: 'Error creating users table: ' + err.message})
+      })
+  } else {
+    console.info('Users table already exists.')
   }
-)
+})
 
+// User Model
 const userModel = {
-  getUsers() {
-    return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM users', [], (err, rows) => {
-        if (err) {
-          return reject(err)
-        }
-        resolve(rows)
+  async getUsers() {
+    return knex('users')
+      .select('*')
+      .then((rows) => {
+        return rows
       })
+      .catch((err) => {
+        return Promise.reject(err)
+      })
+  },
+
+  async getUserById(id) {
+    return knex('users')
+      .where('id', id)
+      .first()
+      .then((row) => {
+        return row
+      })
+      .catch((err) => {
+        return Promise.reject(err)
+      })
+  },
+
+  async createUser(name, email) {
+    return knex('users').insert({name, email}).then(([id]) => {
+      return this.getUserById(id)
+    }).catch((err) => {
+      return Promise.reject(err)
     })
   },
 
-  getUserById(id) {
-    return new Promise((resolve, reject) => {
-      db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
-        if (err) {
-          return reject(err)
-        }
-        resolve(row)
+  async getUserByEmail(email) {
+    return knex('users')
+      .where('email', email)
+      .first()
+      .then((row) => {
+        return row
       })
-    })
+      .catch((err) => {
+        return Promise.reject(err)
+      })
   },
 
-  createUser(name, email) {
-    return new Promise((resolve, reject) => {
-      const stmt = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)')
-      stmt.run([name, email], function (err) {
-        if (err) {
-          return reject(err)
-        }
-        resolve({id: this.lastID, name, email})
-      })
-      stmt.finalize()
-    })
-  },
 }
 
 module.exports = userModel

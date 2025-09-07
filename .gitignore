@@ -9,3 +9,5 @@ package-lock.json
 *.code-workspace 
 *.css.map
 *.config.mjs
+*.db
+*.sqlite3

@@ -1,10 +1,14 @@
-const productModel = require("../db/database.js")
+const productModel = require('../models/productModel.js')
 
 const productController = {
-  async listProducts(req, res) {
+  async listProducts(_req, res) {
     try {
       const products = await productModel.listProducts()
-      res.json(products)
+      if (products.length > 0) {
+        res.json(products)
+      } else {
+        res.status(404).json({ error: 'No products found' })
+      }
     } catch (error) {
       res.status(500).json({ error: error.message })
     }
@@ -17,18 +21,48 @@ const productController = {
       if (product) {
         res.json(product)
       } else {
-        res.status(404).json({ error: 'Product not found' })
+        res.status(404).json({ error: 'Product does not exist' })
       }
     } catch (error) {
       res.status(500).json({ error: error.message })
     }
   },
 
+  // Fns below this should require elevated permissions
   async addProduct(req, res) {
     const { name, description, price } = req.body
     try {
-      const result = await productModel.addProduct(name, description, price)
-      res.status(201).json(result)
+      const [result] = await productModel.addProduct(name, description, price)
+      res.status(201).json({ message: `Product ${result.name} added`, id: result.id })
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
+
+  async updateProduct(req, res) {
+    const id = req.params.id
+    const { name, description, price } = req.body
+    try {
+      const [result] = await productModel.updateProduct(id, name, description, price)
+      if (result) {
+        res.status(200).json({ message: `Product ${result.name} updated`, product: result })
+      } else {
+        res.status(404).json({ error: 'Product does not exist' })
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  },
+
+  async deleteProduct(req, res) {
+    const id = req.params.id
+    try {
+      const [result] = await productModel.deleteProduct(id)
+      if (result) {
+        res.json({ message: 'Product deleted successfully', product: result })
+      } else {
+        res.status(404).json({ error: 'Product does not exist' })
+      }
     } catch (error) {
       res.status(500).json({ error: error.message })
     }

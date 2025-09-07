@@ -2,17 +2,19 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 
-const port = 3000
+const port = process.env.PORT || 3000
 
 // Setup Middleware
 app.use(express.json())
 
+// Import routes
 const usersRouter = require('./routes/users.js')
-const authRouter = require('./routes/auth.js')
+const authRouter = require('./auth/auth.js')
 const cartRouter = require('./routes/cart.js')
 const productRouter = require('./routes/product.js')
 const ordersRouter = require('./routes/orders.js')
 
+// Setup API Routes
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/cart', cartRouter)
@@ -24,5 +26,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`listening at http://localhost:${port}`)
+  console.info(`listening at http://localhost:${port}`)
 })

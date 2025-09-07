@@ -1,0 +1,14 @@
+{
+  "printWidth": 120,
+  "bracketSameLine": true,
+  "insertPragma": false,
+  "singleAttributePerLine": false,
+  "jsxBracketSameLine": false,
+  "jsxSingleQuote": true,
+  "proseWrap": "preserve",
+  "quoteProps": "as-needed",
+  "requirePragma": false,
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2
+}
