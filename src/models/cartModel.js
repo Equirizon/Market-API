@@ -1,37 +1,17 @@
-import db from '../db/database.js'
+const knex = require('../schema/cartSchema.js')
 
 const cart = {
-  viewCart(id) {
-    return new Promise((resolve, reject) => {
-      db.get('SELECT * FROM cart WHERE id = ?', [id], (err, row) => {
-        if (err) reject(err)
-        else resolve(row)
-      })
-    })
+  async viewCart() {
+    return knex.from('cart').select('*')
   },
 
-  deleteCartItem(id) {
-    return new Promise((resolve, reject) => {
-      db.run('DELETE FROM cart WHERE id = ?', [id], function (err) {
-        if (err) reject(err)
-        else resolve({message: 'Item removed from cart', changes: this.changes})
-      })
-    })
+  async addToCart(userId, productId, quantity) {
+    return knex('cart').insert({ user_id: userId, product_id: productId, quantity }, ['id', 'product_id', 'quantity'])
   },
 
-  addToCart(userId, productId, quantity) {
-    return new Promise((resolve, reject) => {
-      db.run(
-        'INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)',
-        [userId, productId, quantity],
-        function (err) {
-          if (err) reject(err)
-          else resolve({message: 'Item added to cart', id: this.lastID})
-        }
-      )
-    })
+  async deleteCartItem(id) {
+    return knex.from('cart').where('id', id).del()
   },
 }
 
 module.exports = cart
-// cartModel.js

@@ -12,8 +12,7 @@ const productModel = {
 
   async addProduct(name, description, price) {
     try {
-      const [product] = await knex.from('products').insert({ name, description, price }).returning(['id', 'name'])
-      return product
+      return await knex.from('products').insert({ name, description, price }, ['id', 'name'])
     } catch (error) {
       console.log(error)
       if (error.code === 'SQLITE_CONSTRAINT') {

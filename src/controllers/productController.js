@@ -4,11 +4,10 @@ const productController = {
   async listProducts(_req, res) {
     try {
       const products = await productModel.listProducts()
-      if (products.length > 0) {
-        res.json(products)
-      } else {
-        res.status(404).json({ error: 'No products found' })
+      if (!products.length) {
+        return res.status(404).json({ error: 'No products found' })
       }
+      res.json(products)
     } catch (error) {
       res.status(500).json({ error: error.message })
     }
@@ -57,9 +56,9 @@ const productController = {
   async deleteProduct(req, res) {
     const id = req.params.id
     try {
-      const [result] = await productModel.deleteProduct(id)
+      const result = await productModel.deleteProduct(id)
       if (result) {
-        res.json({ message: 'Product deleted successfully', product: result })
+        res.json({ message: `Product deleted successfully` })
       } else {
         res.status(404).json({ error: 'Product does not exist' })
       }
