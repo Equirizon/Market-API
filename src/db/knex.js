@@ -7,5 +7,9 @@ const knex = require('knex')({
   useNullAsDefault: true,
 });
 
+knex.raw('PRAGMA foreign_keys = ON').then(() => {
+  console.log('Foreign keys enabled.');
+});
+
 module.exports = knex
 // knex.js

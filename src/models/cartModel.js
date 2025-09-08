@@ -6,7 +6,7 @@ const cart = {
   },
 
   async addToCart(userId, productId, quantity) {
-    return knex('cart').insert({ user_id: userId, product_id: productId, quantity }, ['id', 'product_id', 'quantity'])
+    return knex.from('cart').insert({ user_id: userId, product_id: productId, quantity }, ['id', 'product_id', 'quantity'])
   },
 
   async deleteCartItem(id) {
