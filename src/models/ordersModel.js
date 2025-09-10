@@ -1,35 +1,39 @@
-const db = require('../db/database.js')
+const knex = require('../schema/ordersSchema.js')
+require('../schema/orderItemsSchema.js')
 
 const ordersModel = {
-  checkout(userId, cartItems) {
-    return new Promise((resolve, reject) => {
-      db.run('BEGIN TRANSACTION', [])
-      cartItems.forEach((item) => {
-        db.run('INSERT INTO orders (user_id, product_id, quantity) VALUES (?, ?, ?)', [
-          userId,
-          item.productId,
-          item.quantity,
-        ])
+  async checkout(userId, totalAmount) {
+    try {
+      return await knex.transaction(async (trx) => {
+        const [orderId] = await trx('orders')
+          .insert({ user_id: userId, total_amount: totalAmount })
+          .returning('id')
+
+        const cartItems = await trx('cart').where({ user_id: userId }).select('*')
+
+        
+        const orderItems = cartItems.map((item) => ({
+          order_id: orderId.id,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          price: item.subtotal / item.quantity,
+        }))
+        
+        console.log(orderItems)
+        await trx('order_items').insert(orderItems)
+
+        await trx('cart').where({ user_id: userId }).del()
+
+        return { orderId: orderId.id, message: 'Checkout successful' }
       })
-      db.run('COMMIT', [], (err) => {
-        if (err) {
-          db.run('ROLLBACK', [])
-          reject(err)
-        } else {
-          resolve({message: 'Checkout successful'})
-        }
-      })
-    })  
+    } catch (error) {
+      throw error
+    }
   },
 
-  orders(userId) {
-    return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM orders WHERE user_id = ?', [userId], (err, rows) => {
-        if (err) reject(err)
-        else resolve(rows)
-      })
-    })
-  }
+  async orders(userId) {
+    return await knex.from('orders').where({ user_id: userId }).select('*')
+  },
 }
 
 module.exports = ordersModel

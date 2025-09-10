@@ -11,7 +11,7 @@ const createCartTable = async () => {
           table.foreign('user_id').references('users.id').onDelete('CASCADE')
 
           table.integer('product_id').unsigned().notNullable()
-          table.foreign('product_id').references('products.id').onDelete('CASCADE')
+          table.foreign('product_id').references('products.id').onDelete('CASCADE').onUpdate('CASCADE')
 
           table.decimal('product_price', 10, 2).notNullable()
           table.decimal('subtotal', 10, 2).notNullable().defaultTo(0.0)

@@ -14,10 +14,10 @@ const productModel = {
     try {
       return await knex.from('products').insert({ name, description, price }, ['id', 'name'])
     } catch (error) {
-      console.log(error)
       if (error.code === 'SQLITE_CONSTRAINT') {
         throw new Error('Product with this name already exists.')
       }
+      throw error
     }
   },
 

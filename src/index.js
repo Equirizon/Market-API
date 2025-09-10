@@ -4,6 +4,10 @@ const app = express()
 
 const port = process.env.PORT || 3000
 
+if (process.env.DEV === 'true') {
+  console.info('Running in development mode')
+}
+
 // Setup Middleware
 app.use(express.json())
 
