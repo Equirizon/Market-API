@@ -31,7 +31,7 @@ const createProductsTable = async () => {
 // Useful during development to reset the schema
 // if (process.env.DEV === 'true') {
 //   knex.schema
-//     .dropTable('products')
+//     .dropTableIfExists('products')
 //     .then(() => {
 //       console.info('Products table dropped')
 //     })

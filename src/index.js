@@ -25,10 +25,6 @@ app.use('/api/v1/cart', cartRouter)
 app.use('/api/v1/products', productRouter)
 app.use('/api/v1/orders', ordersRouter)
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
 app.listen(port, () => {
   console.info(`listening at http://localhost:${port}`)
 })

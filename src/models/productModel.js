@@ -14,7 +14,6 @@ const productModel = {
     try {
       return await knex.from('products').insert({ name, description, price }, ['id', 'name'])
     } catch (error) {
-      console.log(error.message)
       if (error.message.includes('UNIQUE constraint failed: products.name')) {
         throw new Error('Product with this name already exists.')
       }

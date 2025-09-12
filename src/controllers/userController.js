@@ -1,9 +1,13 @@
-const userModel = require("../models/userModel.js")
+const userModel = require('../models/userModel.js')
 
 const userController = {
+  // getUsers, getUserById should require admin priviledges
   async getUsers(req, res) {
     try {
       const users = await userModel.getUsers()
+      if (!users.length) {
+        return res.status(404).json({ error: 'No users found' })
+      }
       res.status(200).json(users)
     } catch (err) {
       res.status(500).json({ error: err.message })
@@ -23,20 +27,16 @@ const userController = {
     }
   },
 
-  async createUser(req, res) {
-    const { name, email } = req.body
+  async getProfile(req, res) {
     try {
-      if (!name || !email) {
-        return res.status(400).json({ error: 'Name and email are required' })
+      const { email } = req.user
+      const user = await userModel.getUserByEmail(email)
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
       }
-      const existingUser = await userModel.getUserByEmail(email)
-      if (existingUser) {
-        return res.status(409).json({ error: 'Email already exists' })
-      }
-      const newUser = await userModel.createUser(name, email)
-      res.status(201).json(newUser)
+      res.status(200).json(user)
     } catch (err) {
-      res.status(500).json({ error: err.message })
+      res.status(400).json({ error: err.message })
     }
   },
 }
