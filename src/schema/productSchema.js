@@ -7,10 +7,10 @@ const createProductsTable = async () => {
       return knex.schema
         .createTable('products', function (table) {
           table.increments('id').primary()
-          table.string('name').notNullable()
+          table.string('name').notNullable().unique()
           table.text('description')
-          table.decimal('price', 10, 2).notNullable()
-          table.integer('stock').defaultTo(0)
+          table.decimal('price', 10, 2).notNullable().unsigned()
+          table.integer('stock').defaultTo(0).unsigned()
           table.timestamp('created_at').defaultTo(knex.fn.now())
         })
         .then(() => {
@@ -25,7 +25,7 @@ const createProductsTable = async () => {
   })
 }
 
-createProductsTable()
+
 
 // Uncomment the following block to drop and recreate the products table
 // Useful during development to reset the schema
@@ -42,4 +42,7 @@ createProductsTable()
 // } else {
 //   createProductsTable()
 // }
+
+createProductsTable()
+
 module.exports = knex
