@@ -19,7 +19,6 @@ const ordersModel = {
           price: item.subtotal / item.quantity,
         }))
         
-        console.log(orderItems)
         await trx('order_items').insert(orderItems)
 
         await trx('cart').where({ user_id: userId }).del()

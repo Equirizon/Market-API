@@ -1,7 +1,6 @@
-const jwt = require('jsonwebtoken')
 const authModel = require('./authModel.js')
 const bcrypt = require('bcrypt')
-const ms = require('ms')
+const signJWT = require('../utils/signJWT.js')
 
 const authController = {
   async register(req, res) {
@@ -26,14 +25,12 @@ const authController = {
       }
       bcrypt.compare(password, user.password, (err, result) => {
         if (result) {
-          const expirationTime = process.env.TOKEN_EXPIRATION || '1h'
-          const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: expirationTime })
-          const decoded = jwt.decode(token)
-          const expTimestamp = decoded && decoded.exp ? decoded.exp * 1000 : Date.now() + ms(expirationTime)
-          const expiryDateString = new Date(expTimestamp).toLocaleDateString()
-          const localExpiryTime = new Date(expTimestamp).toLocaleTimeString('it-IT')
-          const expiresOn = `${expiryDateString} at ${localExpiryTime}`
-          res.status(200).json({ message: 'Login successful', token, expiresOn, expiresIn: expirationTime })
+          const { token, expiresOn, expiresIn } = signJWT(
+            { name: user.name, email: user.email },
+            process.env.TOKEN_EXPIRATION || '1h',
+            process.env.JWT_SECRET
+          )
+          res.status(200).json({ message: 'Login successful', token, expiresOn, expiresIn })
         } else {
           res.status(401).json({ error: 'Email or Password is incorrect' })
         }

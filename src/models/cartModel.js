@@ -25,7 +25,6 @@ const cart = {
             .update({ subtotal }, ['id', 'product_id', 'quantity', 'product_price', 'subtotal'])
         })
     } catch (error) {
-      // console.log(error)
       if (error.code === 'SQLITE_CONSTRAINT') {
         throw new Error('Invalid user ID or product ID.')
       }
