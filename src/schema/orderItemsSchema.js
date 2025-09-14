@@ -1,6 +1,6 @@
 const knex = require('../db/knex.js')
 
-const createOrderItemsTable = async () => {
+const createOrderItemsTable = () => {
   knex.schema.hasTable('order_items').then((exists) => {
     if (!exists) {
       return knex.schema

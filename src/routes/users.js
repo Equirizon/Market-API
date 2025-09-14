@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController.js')
-const { authenticateToken } = require('../auth/authenticateToken.js')
+const { authenticateToken } = require('../auth/authTokenMiddleware.js')
 
 // These commented routes should require admin privileges
 // router.get('/', userController.getUsers)

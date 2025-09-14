@@ -1,4 +1,5 @@
 const knex = require('../schema/usersSchema.js')
+require('./refreshTokensSchema.js')
 
 // Auth Model
 const authModel = {
@@ -15,6 +16,18 @@ const authModel = {
   async getUserByEmail(email) {
     return await knex('users').where({ email }).first()
   },
+
+  async saveRefreshToken(email, refreshToken, expiresOn) {
+    return await knex('refresh_tokens').insert({ email, refresh_token: refreshToken, expires_on: expiresOn }, ['email', 'refresh_token', 'expires_on'])
+  },
+
+  async getRefreshToken(email) {
+    return await knex('refresh_tokens').where({ email }).first()
+  },
+
+  async removeRefreshToken(email) {
+    return await knex('refresh_tokens').where({ email }).del()
+  }
 }
 
 module.exports = authModel

@@ -1,6 +1,6 @@
 const knex = require('../db/knex.js')
 
-const createProductsTable = async () => {
+const createProductsTable = () => {
   // Create products table if it doesn't exist
   knex.schema.hasTable('products').then((exists) => {
     if (!exists) {

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const ms = require('ms')
 
-const signJWT = (payload, expiresIn, secret) => {
+const generateToken = (payload, secret, expiresIn) => {
   const expirationTime = expiresIn || '1h'
   const token = jwt.sign(payload, secret, { expiresIn: expirationTime })
   const decoded = jwt.decode(token)
@@ -13,4 +13,4 @@ const signJWT = (payload, expiresIn, secret) => {
   return { token, expiresOn, expiresIn: expirationTime }
 }
 
-module.exports = signJWT
+module.exports = generateToken
