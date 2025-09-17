@@ -7,7 +7,8 @@ const authModel = {
     try {
       return await knex('users').insert({ name, email, password }, ['id', 'name', 'email'])
     } catch (err) {
-      if (err.message.includes('SQLITE_CONSTRAINT: UNIQUE constraint failed')) {
+      console.log(err)
+      if (err.message.includes('SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email')) {
         throw new Error('Email already been used.')
       }
     }
