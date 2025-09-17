@@ -37,11 +37,11 @@ To get started with the Market API, follow these steps:
 
 ## To do
 
+- [x] Auto decrementing/incrementing stock count
 - [ ] Add role based authentication
 - [ ] Add more endpoints for market data
-- [ ] Automated tests
 - [ ] Add error handling helpers
-- [ ] Auto decrementing/incrementing stock count
+- [ ] Automated tests
 <!-- ## License -->
 
 <!-- This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->

@@ -1,5 +1,6 @@
 const ordersModel = require('../models/ordersModel.js')
 const cartModel = require('../models/cartModel.js')
+const productModel = require('../models/productModel.js')
 
 const ordersController = {
   async checkout(req, res) {
@@ -9,7 +10,6 @@ const ordersController = {
       if (!cartItems.length) {
         return res.status(400).json({ error: 'Cart is empty' })
       }
-
       const totalCartValue = cartItems.reduce((sum, item) => sum + item.subtotal, 0)
       const result = await ordersModel.checkout(userId, totalCartValue)
 

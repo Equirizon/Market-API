@@ -40,9 +40,9 @@ const productController = {
 
   async updateProduct(req, res) {
     const id = req.params.id
-    const { name, description, price } = req.body
+    const { name, description, price, stock } = req.body
     try {
-      const [result] = await productModel.updateProduct(id, name, description, price)
+      const [result] = await productModel.updateProduct(id, name, description, price, stock)
       if (result) {
         res.status(200).json({ message: `Product ${result.name} updated`, product: result })
       } else {

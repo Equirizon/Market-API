@@ -3,31 +3,47 @@ require('../schema/orderItemsSchema.js')
 
 const ordersModel = {
   async checkout(userId, totalAmount) {
-    try {
-      return await knex.transaction(async (trx) => {
-        const [orderId] = await trx('orders')
-          .insert({ user_id: userId, total_amount: totalAmount })
-          .returning('id')
+    return await knex.transaction(async (trx) => {
+      // 1. Insert into orders table
+      const [orderId] = await trx('orders').insert({ user_id: userId, total_amount: totalAmount }).returning('id')
 
-        const cartItems = await trx('cart').where({ user_id: userId }).select('*')
+      // 2. Get cart items for the user
+      const cartItems = await trx('cart').where({ user_id: userId }).select('*')
 
-        
-        const orderItems = cartItems.map((item) => ({
-          order_id: orderId.id,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          price: item.subtotal / item.quantity,
-        }))
-        
-        await trx('order_items').insert(orderItems)
+      // 3. Check stock
+      await Promise.all(
+        cartItems.map(async (item) => {
+          const product = await trx('products').where({ id: item.product_id }).select('stock').first()
+          console.log(product.stock)
+          console.log(item.quantity)
+          if (product.stock - item.quantity < 0) {
+            throw new Error('Insufficient stock for one or more products')
+          }
+        })
+      )
+      // 4. Decrement stock
+      await Promise.all(
+        cartItems.map(async (item) => {
+          const product = await trx('products').where({ id: item.product_id }).select('stock').first()
+          if (product.stock - item.quantity >= 0) {
+            await trx('products').where({ id: item.product_id }).decrement('stock', item.quantity)
+          }
+        })
+      )
+      // 5. Insert into order_items table
+      const orderItems = cartItems.map((item) => ({
+        order_id: orderId.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.subtotal / item.quantity,
+      }))
+      await trx('order_items').insert(orderItems)
 
-        await trx('cart').where({ user_id: userId }).del()
+      // 6. Clear the user's cart
+      await trx('cart').where({ user_id: userId }).del()
 
-        return { orderId: orderId.id, message: 'Checkout successful' }
-      })
-    } catch (error) {
-      throw error
-    }
+      return { orderId: orderId.id, message: 'Checkout successful' }
+    })
   },
 
   async orders(userId) {

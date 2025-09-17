@@ -7,7 +7,7 @@ const productModel = {
   },
 
   async getProduct(id) {
-    return await knex.from('products').where('id', id).first()
+    return await knex.from('products').where({ id }).first()
   },
 
   async addProduct(name, description, price) {
@@ -23,15 +23,22 @@ const productModel = {
     }
   },
 
-  async updateProduct(id, name, description, price) {
+  async updateProduct(id, name, description, price, stock) {
     return await knex
       .from('products')
-      .where('id', id)
-      .update({ name, description, price }, ['name', 'description', 'price'])
+      .where({ id })
+      .update({ name, description, price, stock }, ['name', 'description', 'price', 'stock'])
   },
 
   async deleteProduct(id) {
-    return await knex.from('products').where('id', id).del()
+    return await knex.from('products').where({ id }).del()
+  },
+
+  async decrementStock(id, quantity) {
+    return await knex('products')
+      .where({ id })
+      .decrement('stock', quantity)
+      .returning('*')
   },
 }
 
