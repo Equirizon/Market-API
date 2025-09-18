@@ -1,4 +1,4 @@
-const knex = require('../db/knex.js')
+const knex = require('../../db/knex.js')
 
 const createRefreshTokensTable = () => {
   knex.schema.hasTable('refresh_tokens').then((exists) => {

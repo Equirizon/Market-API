@@ -1,6 +1,5 @@
 const ordersModel = require('../models/ordersModel.js')
 const cartModel = require('../models/cartModel.js')
-const productModel = require('../models/productModel.js')
 
 const ordersController = {
   async checkout(req, res) {
@@ -12,10 +11,10 @@ const ordersController = {
       }
       const totalCartValue = cartItems.reduce((sum, item) => sum + item.subtotal, 0)
       const result = await ordersModel.checkout(userId, totalCartValue)
-
       res.status(200).json(result)
     } catch (error) {
-      res.status(500).json({ error: error.message })
+      const insufficientStock = error.message.includes('Insufficient')
+      res.status(insufficientStock ? 400 : 500).json({ error: error.message })
     }
   },
 

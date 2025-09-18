@@ -1,5 +1,5 @@
 const knex = require('../schema/usersSchema.js')
-require('./refreshTokensSchema.js')
+require('./schema/refreshTokensSchema.js')
 
 // Auth Model
 const authModel = {

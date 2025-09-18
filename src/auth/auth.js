@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { register, login, logout, refreshToken } = require('./authController.js')
-const { authenticateRefreshToken, authenticateToken } = require('./authTokenMiddleware.js')
+const { authenticateRefreshToken, authenticateToken } = require('./middleware/authTokenMiddleware.js')
 
 router.post('/register', register)
 router.post('/login', login)

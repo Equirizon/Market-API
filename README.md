@@ -34,14 +34,14 @@ To get started with the Market API, follow these steps:
 
 4. Access the API documentation at `http://localhost:3000/docs`.
 
-
 ## To do
 
-- [x] Auto decrementing/incrementing stock count
-- [ ] Add role based authentication
+- [x] Auto update stock count on checkout
+- [ ] Create an Auth middleware (e.g., JWT-based) to protect all API endpoints
+- [ ] Add role based authentication (e.g., define roles such as 'admin' and 'user'; 'admin' can manage market data and users, 'user' can view and trade market data)
 - [ ] Add more endpoints for market data
 - [ ] Add error handling helpers
-- [ ] Automated tests
+- [ ] Automated tests (using Jest or Mocha)
 <!-- ## License -->
 
 <!-- This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->

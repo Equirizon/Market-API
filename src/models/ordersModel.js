@@ -2,6 +2,7 @@ const knex = require('../schema/ordersSchema.js')
 require('../schema/orderItemsSchema.js')
 
 const ordersModel = {
+  // Checkout transaction
   async checkout(userId, totalAmount) {
     return await knex.transaction(async (trx) => {
       // 1. Insert into orders table
@@ -14,8 +15,6 @@ const ordersModel = {
       await Promise.all(
         cartItems.map(async (item) => {
           const product = await trx('products').where({ id: item.product_id }).select('stock').first()
-          console.log(product.stock)
-          console.log(item.quantity)
           if (product.stock - item.quantity < 0) {
             throw new Error('Insufficient stock for one or more products')
           }
@@ -26,8 +25,9 @@ const ordersModel = {
         cartItems.map(async (item) => {
           const product = await trx('products').where({ id: item.product_id }).select('stock').first()
           if (product.stock - item.quantity >= 0) {
-            await trx('products').where({ id: item.product_id }).decrement('stock', item.quantity)
+            return await trx('products').where({ id: item.product_id }).decrement('stock', item.quantity)
           }
+          throw new Error('Insufficient stock for one or more products')
         })
       )
       // 5. Insert into order_items table
