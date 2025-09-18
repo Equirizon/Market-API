@@ -16,7 +16,7 @@ To get started with the Market API, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/market-api.git
+   git clone https://github.com/Equirizon/Market-API.git
    ```
 
 2. Install the required dependencies:
@@ -29,7 +29,7 @@ To get started with the Market API, follow these steps:
 3. Start the API server:
 
    ```bash
-   npm start
+   npm run dev
    ```
 
 4. Access the API documentation at `http://localhost:3000/docs`.
