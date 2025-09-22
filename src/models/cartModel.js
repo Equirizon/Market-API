@@ -1,8 +1,8 @@
 const knex = require('../schema/cartSchema.js')
 
 const cart = {
-  async viewCart() {
-    return await knex.from('cart').select('*')
+  async viewCart(id) {
+    return await knex.from('cart').where({ user_id: id }).select('*')
   },
 
   async addToCart(userId, productId, quantity, productPrice) {

@@ -32,13 +32,13 @@ To get started with the Market API, follow these steps:
    npm run dev
    ```
 
-4. Access the API documentation at `http://localhost:3000/docs`.
+<!-- 4. Access the API documentation at `http://localhost:3000/docs`. -->
 
 ## To do
 
 - [x] Auto update stock count on checkout
-- [ ] Create an Auth middleware (e.g., JWT-based) to protect all API endpoints
-- [ ] Add role based authentication (e.g., define roles such as 'admin' and 'user'; 'admin' can manage market data and users, 'user' can view and trade market data)
+- [x] Add role based authentication (e.g., define roles such as 'admin' and 'user'; 'admin' can manage market data and users, 'user' can view and trade market data)
+- [x] Create an Auth middleware (e.g., JWT-based) to protect all API endpoints
 - [ ] Add more endpoints for market data
 - [ ] Add error handling helpers
 - [ ] Automated tests (using Jest or Mocha)

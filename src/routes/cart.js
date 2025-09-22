@@ -1,9 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const cartController = require('../controllers/cartController.js')
+const { viewCart, addToCart, deleteCartItem } = require('../controllers/cartController.js')
+const { authenticateToken } = require('../auth/middleware/authTokenMiddleware.js')
 
-router.get('/', cartController.viewCart)
-router.post('/', cartController.addToCart)
-router.delete('/:id', cartController.deleteCartItem)
+router.use(authenticateToken)
+
+// private routes
+router.get('/', viewCart)
+router.post('/', addToCart)
+router.delete('/:id', deleteCartItem)
 
 module.exports = router

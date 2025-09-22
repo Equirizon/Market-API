@@ -1,11 +1,26 @@
 const express = require('express')
 const router = express.Router()
-const productController = require('../controllers/productController.js')
+const {
+  listProducts,
+  getProduct,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} = require('../controllers/productController.js')
+const { authenticateToken } = require('../auth/middleware/authTokenMiddleware.js')
+const { roleMiddleware } = require('../auth/middleware/authMiddleware.js')
 
-router.get('/', productController.listProducts)
-router.get('/:id', productController.getProduct)
-router.post('/', productController.addProduct)
-router.put('/:id', productController.updateProduct)
-router.delete('/:id', productController.deleteProduct)
+
+// Public routes
+router.get('/', listProducts)
+router.get('/:id', getProduct)
+
+router.use(authenticateToken)
+router.use(roleMiddleware)
+
+// Protected routes (admin only)
+router.post('/', addProduct)
+router.put('/:id', updateProduct)
+router.delete('/:id', deleteProduct)
 
 module.exports = router

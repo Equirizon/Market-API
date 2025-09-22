@@ -2,9 +2,10 @@ const cartModel = require('../models/cartModel.js')
 const productModel = require('../models/productModel.js')
 
 const cartController = {
-  async viewCart(_req, res) {
+  async viewCart(req, res) {
+    const user = req.user
     try {
-      const cart = await cartModel.viewCart()
+      const cart = await cartModel.viewCart(user.id)
       if (!cart.length) {
         return res.status(404).json({ error: 'Cart is empty' })
       }
@@ -15,13 +16,11 @@ const cartController = {
   },
 
   async addToCart(req, res) {
-    const { userId, productId, quantity } = req.body
+    const { productId, quantity } = req.body
+    const user = req.user
     try {
-      // Consider adding service layer to handle business logic
-      // e.g., checking stock availability, user validation, etc.
-      // For now, we assume userId and productId are valid and quantity is positive
       const product = await productModel.getProduct(productId)
-      const [result] = await cartModel.addToCart(userId, productId, quantity, product.price)
+      const [result] = await cartModel.addToCart(user.id, productId, quantity, product.price)
       res.status(201).json({ message: `Item #${result.product_id} added to cart`, cartItem: result })
     } catch (error) {
       res.status(500).json({ error: error.message })

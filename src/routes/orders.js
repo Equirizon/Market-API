@@ -1,8 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const ordersController = require('../controllers/ordersController.js')
+const { checkout, orders } = require('../controllers/ordersController.js')
+const { authenticateToken } = require('../auth/middleware/authTokenMiddleware.js')
 
-router.get('/checkout/user/:id', ordersController.checkout)
-router.get('/user/:id', ordersController.orders)
+router.use(authenticateToken)
+
+router.get('/', orders)
+router.get('/checkout', checkout)
 
 module.exports = router

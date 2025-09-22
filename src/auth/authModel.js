@@ -6,11 +6,11 @@ const authModel = {
   async registerUser(name, email, password) {
     try {
       return await knex('users').insert({ name, email, password }, ['id', 'name', 'email'])
-    } catch (err) {
-      console.log(err)
-      if (err.message.includes('SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email')) {
+    } catch (error) {
+      if (error.message.includes('SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email')) {
         throw new Error('Email already been used.')
       }
+      throw error
     }
   },
 

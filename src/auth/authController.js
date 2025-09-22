@@ -29,7 +29,7 @@ const authController = {
       }
       bcrypt.compare(password, user.password, async (_err, result) => {
         if (result) {
-          const userPayload = { name: user.name, email: user.email }
+          const userPayload = { name: user.name, email: user.email, id: user.id }
           const {
             token: accessToken,
             expiresOn: accessExpiresOn,
@@ -40,8 +40,7 @@ const authController = {
             expiresIn: refreshExpiresIn,
             expiresOn: refreshExpiresOn,
           } = generateToken(userPayload, process.env.REFRESH_TOKEN_SECRET, '1h')
-          const [refreshTokenResult] = await authModel.saveRefreshToken(user.email, refreshToken, refreshExpiresOn)
-          console.log(refreshTokenResult)
+          await authModel.saveRefreshToken(user.email, refreshToken, refreshExpiresOn)
           res.status(200).json({
             message: 'Login successful',
             accessToken,
@@ -64,12 +63,12 @@ const authController = {
     try {
       const {
         body: { token: refreshToken },
-        user: { name, email },
+        user: { name, email, id },
       } = req
       const { refresh_token } = (await authModel.getRefreshToken(email)) || ''
       if (refresh_token !== refreshToken) return res.status(403).json({ error: 'Invalid refresh token' })
       const { token: accessToken } = generateToken(
-        { name, email },
+        { name, email, id },
         process.env.JWT_SECRET,
         process.env.TOKEN_EXPIRATION || '1h'
       )

@@ -1,11 +1,14 @@
 const knex = require('../../db/knex.js')
 
+
+// TODO: modify to store multiple tokens per user for multi-device support
+// TODO: add revoke and device columns
 const createRefreshTokensTable = () => {
   knex.schema.hasTable('refresh_tokens').then((exists) => {
     if (!exists) {
       return knex.schema
         .createTable('refresh_tokens', (table) => {
-          table.increments('id').primary
+          table.increments('id').primary()
           table.string('refresh_token').unique().notNullable()
 
           table.string('email').unique().notNullable()
@@ -26,18 +29,20 @@ const createRefreshTokensTable = () => {
   })
 }
 
-if (process.env.DEV === 'true') {
-  knex.schema
-    .dropTableIfExists('refresh_tokens')
-    .then(() => {
-      console.info('Refresh Tokens table dropped.')
-    })
-    .catch((error) => {
-      console.error({ type: 'error', message: 'Error dropping refresh_tokens table' + error.message })
-    })
-    .finally(createRefreshTokensTable)
-} else {
-  createRefreshTokensTable()
-}
+createRefreshTokensTable()
+
+// if (process.env.DEV === 'true') {
+//   knex.schema
+//     .dropTableIfExists('refresh_tokens')
+//     .then(() => {
+//       console.info('Refresh Tokens table dropped.')
+//     })
+//     .catch((error) => {
+//       console.error({ type: 'error', message: 'Error dropping refresh_tokens table' + error.message })
+//     })
+//     .finally(createRefreshTokensTable)
+// } else {
+//   createRefreshTokensTable()
+// }
 
 module.exports = knex

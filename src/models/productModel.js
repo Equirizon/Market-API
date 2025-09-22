@@ -20,6 +20,7 @@ const productModel = {
       if (error.message.includes('NOT NULL constraint')) {
         throw new Error('Invalid product data.')
       }
+      throw error
     }
   },
 

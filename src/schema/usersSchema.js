@@ -9,6 +9,7 @@ const createUsersTable = () => {
           table.string('name').notNullable()
           table.string('email').unique().notNullable()
           table.string('password').notNullable()
+          table.enu('role', ['user', 'admin']).defaultTo('user').notNullable()
           table.timestamp('created_at').defaultTo(knex.fn.now())
         })
         .then(() => {
@@ -24,6 +25,16 @@ const createUsersTable = () => {
 }
 
 createUsersTable()
+
+const changeRole = async (id, role) => {
+  if (!id) throw new Error('ID is required')
+  if (role !== 'user' && role !== 'admin') throw new Error('Incorrect role value')
+  const [user] = await knex('users').where({ id }).update({ role }, ['role', 'name'])
+  if (!user) throw new Error('User not found')
+  console.info(`Set ${user.name}'s role to ${user.role}.`)
+}
+
+changeRole(1, 'admin')
 
 // if (process.env.DEV === 'true') {
 //   knex.schema
