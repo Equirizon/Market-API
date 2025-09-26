@@ -20,29 +20,28 @@ const createProductsTable = () => {
           console.error({ type: 'error', message: 'Error creating products table: ' + err.message })
         })
     } else {
-      console.info('Products table already exists.')
+      if (process.env.DEV === 'true') return console.info('Products table already exists.')
     }
   })
 }
 
-
+// createProductsTable()
 
 // Uncomment the following block to drop and recreate the products table
 // Useful during development to reset the schema
-// if (process.env.DEV === 'true') {
-//   knex.schema
-//     .dropTableIfExists('products')
-//     .then(() => {
-//       console.info('Products table dropped')
-//     })
-//     .catch((err) => {
-//       console.error({ type: 'error', message: 'Error dropping products table: ' + err.message })
-//     })
-//     .finally(createProductsTable)
-// } else {
-//   createProductsTable()
-// }
+if (process.env.DEV === 'true') {
+  knex.schema
+    .dropTableIfExists('products')
+    .then(() => {
+      console.info('Products table dropped')
+    })
+    .catch((err) => {
+      console.error({ type: 'error', message: 'Error dropping products table: ' + err.message })
+    })
+    .finally(createProductsTable)
+} else {
+  createProductsTable()
+}
 
-createProductsTable()
 
 module.exports = knex

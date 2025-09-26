@@ -24,7 +24,7 @@ const createOrderItemsTable = () => {
           console.error({ type: 'error', message: 'Error creating order items table: ' + err.message })
         })
     } else {
-      console.info('Order items table already exists')
+      if (process.env.DEV === 'true') return console.info('Order items table already exists')
     }
   })
 }

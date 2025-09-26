@@ -26,5 +26,7 @@ app.use('/api/v1/products', productRouter)
 app.use('/api/v1/orders', ordersRouter)
 
 app.listen(port, () => {
-  console.info(`listening at http://localhost:${port}`)
+  if (process.env.DEV === 'true') return console.info(`listening at http://localhost:${port}`)
 })
+
+module.exports = app

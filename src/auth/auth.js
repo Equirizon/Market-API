@@ -5,7 +5,7 @@ const { authenticateRefreshToken, authenticateToken } = require('./middleware/au
 
 router.post('/register', register)
 router.post('/login', login)
-router.post('/token', authenticateRefreshToken, refreshToken)
+router.post('/refresh', authenticateRefreshToken, refreshToken)
 router.delete('/logout', authenticateToken, logout)
 
 module.exports = router

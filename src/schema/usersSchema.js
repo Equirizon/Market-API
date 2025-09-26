@@ -1,4 +1,5 @@
 const knex = require('../db/knex.js')
+const changeRole = require('../utils/changeRole.js')
 
 const createUsersTable = () => {
   knex.schema.hasTable('users').then((exists) => {
@@ -19,35 +20,26 @@ const createUsersTable = () => {
           console.error({ type: 'error', message: 'Error creating users table: ' + err.message })
         })
     } else {
-      console.info('Users table already exists.')
+      if (process.env.DEV === 'true') return console.info('Users table already exists.')
     }
   })
 }
 
-createUsersTable()
+// createUsersTable()
+// changeRole(1, 'admin')
 
-const changeRole = async (id, role) => {
-  if (!id) throw new Error('ID is required')
-  if (role !== 'user' && role !== 'admin') throw new Error('Incorrect role value')
-  const [user] = await knex('users').where({ id }).update({ role }, ['role', 'name'])
-  if (!user) throw new Error('User not found')
-  console.info(`Set ${user.name}'s role to ${user.role}.`)
+if (process.env.DEV === 'true') {
+  knex.schema
+    .dropTableIfExists('users')
+    .then(() => {
+      console.info('Users table dropped.')
+    })
+    .catch((err) => {
+      console.error({ type: 'error', message: 'Error dropping users table: ' + err.message })
+    })
+    .finally(createUsersTable)
+} else {
+  createUsersTable()
 }
-
-changeRole(1, 'admin')
-
-// if (process.env.DEV === 'true') {
-//   knex.schema
-//     .dropTableIfExists('users')
-//     .then(() => {
-//       console.info('Users table dropped.')
-//     })
-//     .catch((err) => {
-//       console.error({ type: 'error', message: 'Error dropping users table: ' + err.message })
-//     })
-//     .finally(createUsersTable)
-// } else {
-//   createUsersTable()
-// }
 
 module.exports = knex

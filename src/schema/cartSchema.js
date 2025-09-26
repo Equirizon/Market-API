@@ -25,7 +25,7 @@ const createCartTable = () => {
           console.error({ type: 'error', message: 'Error creating cart table: ' + err.message })
         })
     } else {
-      console.info('Cart table already exists.')
+      if (process.env.DEV === 'true') return console.info('Cart table already exists.')
     }
   })
 }

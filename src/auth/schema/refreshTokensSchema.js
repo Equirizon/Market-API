@@ -24,25 +24,25 @@ const createRefreshTokensTable = () => {
           console.error({ type: 'error', message: 'Error creating refresh_tokens table' + error.message })
         })
     } else {
-      console.info('Refresh Tokens table already exists.')
+      if (process.env.DEV === 'true') return console.info('Refresh Tokens table already exists.')
     }
   })
 }
 
-createRefreshTokensTable()
+// createRefreshTokensTable()
 
-// if (process.env.DEV === 'true') {
-//   knex.schema
-//     .dropTableIfExists('refresh_tokens')
-//     .then(() => {
-//       console.info('Refresh Tokens table dropped.')
-//     })
-//     .catch((error) => {
-//       console.error({ type: 'error', message: 'Error dropping refresh_tokens table' + error.message })
-//     })
-//     .finally(createRefreshTokensTable)
-// } else {
-//   createRefreshTokensTable()
-// }
+if (process.env.DEV === 'true') {
+  knex.schema
+    .dropTableIfExists('refresh_tokens')
+    .then(() => {
+      console.info('Refresh Tokens table dropped.')
+    })
+    .catch((error) => {
+      console.error({ type: 'error', message: 'Error dropping refresh_tokens table' + error.message })
+    })
+    .finally(createRefreshTokensTable)
+} else {
+  createRefreshTokensTable()
+}
 
 module.exports = knex

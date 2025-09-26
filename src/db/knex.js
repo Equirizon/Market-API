@@ -5,11 +5,11 @@ const knex = require('knex')({
     filename: './dev.sqlite3',
   },
   useNullAsDefault: true,
-});
+})
 
 knex.raw('PRAGMA foreign_keys = ON').then(() => {
-  console.info('Foreign keys enabled.');
-});
+  if (process.env.DEV === 'true') return console.info('Foreign keys enabled.')
+})
 
 module.exports = knex
 // knex.js
