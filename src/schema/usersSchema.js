@@ -1,5 +1,6 @@
 const knex = require('../db/knex.js')
 const changeRole = require('../utils/changeRole.js')
+const logDev = require('../utils/devLogging.js')
 
 const createUsersTable = () => {
   knex.schema.hasTable('users').then((exists) => {
@@ -20,7 +21,7 @@ const createUsersTable = () => {
           console.error({ type: 'error', message: 'Error creating users table: ' + err.message })
         })
     } else {
-      if (process.env.DEV === 'true') return console.info('Users table already exists.')
+      logDev('Users table already exists.')
     }
   })
 }

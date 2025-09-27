@@ -19,16 +19,20 @@ const authModel = {
   },
 
   async saveRefreshToken(email, refreshToken, expiresOn) {
-    return await knex('refresh_tokens').insert({ email, refresh_token: refreshToken, expires_on: expiresOn }, ['email', 'refresh_token', 'expires_on'])
+    return await knex('refresh_tokens').insert({ email, refresh_token: refreshToken, expires_on: expiresOn }, [
+      'email',
+      'refresh_token',
+      'expires_on',
+    ])
   },
 
-  async getRefreshToken(email) {
-    return await knex('refresh_tokens').where({ email }).first()
+  async getRefreshTokensFromDB(email) {
+    return await knex('refresh_tokens').where({ email }).select('*')
   },
 
-  async removeRefreshToken(email) {
-    return await knex('refresh_tokens').where({ email }).del()
-  }
+  async revokeRefreshToken(email) {
+    return await knex('refresh_tokens').where({ email, revoked: false }).update({ revoked: true })
+  },
 }
 
 module.exports = authModel

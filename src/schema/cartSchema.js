@@ -1,4 +1,5 @@
 const knex = require('../db/knex.js')
+const logDev = require('../utils/devLogging.js')
 
 const createCartTable = () => {
   knex.schema.hasTable('cart').then((exists) => {
@@ -25,7 +26,7 @@ const createCartTable = () => {
           console.error({ type: 'error', message: 'Error creating cart table: ' + err.message })
         })
     } else {
-      if (process.env.DEV === 'true') return console.info('Cart table already exists.')
+      logDev('Cart table already exists.')
     }
   })
 }

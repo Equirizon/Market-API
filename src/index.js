@@ -1,12 +1,11 @@
-require('dotenv').config()
+require('dotenv').config({ quiet: true })
 const express = require('express')
 const app = express()
+const logDev = require('./utils/devLogging.js')
 
 const port = process.env.PORT || 3000
 
-if (process.env.DEV === 'true') {
-  console.info('Running in development mode')
-}
+logDev('Running in development mode')
 
 // Setup Middleware
 app.use(express.json())
@@ -26,7 +25,7 @@ app.use('/api/v1/products', productRouter)
 app.use('/api/v1/orders', ordersRouter)
 
 app.listen(port, () => {
-  if (process.env.DEV === 'true') return console.info(`listening at http://localhost:${port}`)
+  logDev(`listening at http://localhost:${port}`)
 })
 
 module.exports = app

@@ -1,6 +1,7 @@
 const authModel = require('./authModel.js')
 const bcrypt = require('bcrypt')
 const generateToken = require('../utils/generateToken.js')
+const logDev = require('../utils/devLogging.js')
 
 const authController = {
   async register(req, res) {
@@ -20,10 +21,8 @@ const authController = {
     try {
       const { email, password } = req.body
       const user = await authModel.getUserByEmail(email)
-      const alreadyLoggedIn = await authModel.getRefreshToken(email)
-      if (alreadyLoggedIn) {
-        return res.status(400).json({ error: 'User already logged in' })
-      }
+      const result = await authModel.revokeRefreshToken(email)
+      if (result) logDev('Old refresh token revoked on new login.')
       if (!user) {
         return res.status(401).json({ error: 'Email or Password is incorrect' })
       }
@@ -59,14 +58,20 @@ const authController = {
     }
   },
 
+  // after authenticateRefreshToken Middleware
   async refreshToken(req, res) {
     try {
       const {
         body: { token: refreshToken },
         user: { name, email, id },
       } = req
-      const { refresh_token } = (await authModel.getRefreshToken(email)) || ''
-      if (refresh_token !== refreshToken) return res.status(403).json({ error: 'Invalid refresh token' })
+      const refreshTokens = await authModel.getRefreshTokensFromDB(email)
+      const activeRefreshToken = refreshTokens.find((token) => token.revoked === 0)
+      const anyUnrevokedTokens = refreshTokens.map((token) => token.revoked).some((revoke) => revoke === 0)
+      if (!anyUnrevokedTokens) return res.status(403).json({ error: 'Invalid refresh token, please login again' })
+      if (activeRefreshToken?.refresh_token !== refreshToken) {
+        return res.status(401).json({ error: 'Invalid refresh token' })
+      }
       const { token: accessToken } = generateToken(
         { name, email, id },
         process.env.JWT_SECRET,
@@ -81,8 +86,11 @@ const authController = {
   async logout(req, res) {
     try {
       const { email } = req.user
-      const result = await authModel.removeRefreshToken(email)
-      if (result) return res.sendStatus(204)
+      const result = await authModel.revokeRefreshToken(email)
+      if (result) {
+        logDev('Old refresh token revoked on new login.')
+        return res.sendStatus(204)
+      }
       res.sendStatus(418)
     } catch (error) {
       res.status(500).json({ error: error.message })

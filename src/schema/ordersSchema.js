@@ -1,4 +1,5 @@
 const knex = require('../db/knex.js')
+const logDev = require('../utils/devLogging.js')
 
 const createOrdersTable = () => {
   knex.schema.hasTable('orders').then((exists) => {
@@ -20,7 +21,7 @@ const createOrdersTable = () => {
           console.error({ type: 'error', message: 'Error creating orders table: ' + err.message })
         })
     } else {
-      if (process.env.DEV === 'true') return console.info('Orders table already exists.')
+      logDev('Orders table already exists.')
     }
   })
 }

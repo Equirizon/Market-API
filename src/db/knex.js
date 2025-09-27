@@ -1,3 +1,5 @@
+const logDev = require('../utils/devLogging.js')
+
 // Setup Knex
 const knex = require('knex')({
   client: 'sqlite3',
@@ -8,7 +10,7 @@ const knex = require('knex')({
 })
 
 knex.raw('PRAGMA foreign_keys = ON').then(() => {
-  if (process.env.DEV === 'true') return console.info('Foreign keys enabled.')
+  logDev('Foreign keys enabled.')
 })
 
 module.exports = knex

@@ -1,4 +1,5 @@
 const knex = require('../db/knex.js')
+const logDev = require('../utils/devLogging.js')
 
 const createProductsTable = () => {
   // Create products table if it doesn't exist
@@ -20,15 +21,16 @@ const createProductsTable = () => {
           console.error({ type: 'error', message: 'Error creating products table: ' + err.message })
         })
     } else {
-      if (process.env.DEV === 'true') return console.info('Products table already exists.')
+      logDev('Products table already exists.')
     }
   })
 }
 
-// createProductsTable()
-
 // Uncomment the following block to drop and recreate the products table
 // Useful during development to reset the schema
+
+// createProductsTable()
+
 if (process.env.DEV === 'true') {
   knex.schema
     .dropTableIfExists('products')

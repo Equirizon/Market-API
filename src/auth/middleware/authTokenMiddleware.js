@@ -20,7 +20,6 @@ const authenticateRefreshToken = (req, res, next) => {
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403)
     req.user = user
-    // req.refreshToken = true
     next()
   })
 }

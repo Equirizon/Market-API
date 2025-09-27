@@ -1,5 +1,5 @@
 const knex = require('../../db/knex.js')
-
+const logDev = require('../../utils/devLogging.js')
 
 // TODO: modify to store multiple tokens per user for multi-device support
 // TODO: add revoke and device columns
@@ -11,9 +11,11 @@ const createRefreshTokensTable = () => {
           table.increments('id').primary()
           table.string('refresh_token').unique().notNullable()
 
-          table.string('email').unique().notNullable()
+          table.string('email').notNullable()
           table.foreign('email').references('users.email').onDelete('CASCADE').onUpdate('CASCADE')
 
+          table.boolean('revoked').defaultTo(false)
+          table.string('device').nullable()
           table.timestamp('created_at').defaultTo(knex.fn.now())
           table.timestamp('expires_on').notNullable()
         })
@@ -24,7 +26,7 @@ const createRefreshTokensTable = () => {
           console.error({ type: 'error', message: 'Error creating refresh_tokens table' + error.message })
         })
     } else {
-      if (process.env.DEV === 'true') return console.info('Refresh Tokens table already exists.')
+      logDev('Refresh Tokens table already exists.')
     }
   })
 }

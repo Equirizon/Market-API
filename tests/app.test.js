@@ -29,7 +29,15 @@ describe('GET /api/v1/users', () => {
       const response = await request(app).get('/api/v1/users').set('Authorization', `Bearer ${token}`)
       expect(response.statusCode).toBe(200)
     })
-    // should respond with an array of user objects in json
-    // should specify json in the content header
+    test('should respond with an array of user objects in json', async () => {
+      const response = await request(app).get('/api/v1/users').set('Authorization', `Bearer ${token}`)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(Array.isArray(response.body)).toBe(true)
+      response.body.forEach((user) => {
+        expect(user).toHaveProperty('id')
+        expect(user).toHaveProperty('name')
+        expect(user).toHaveProperty('email')
+      })
+    })
   })
 })
