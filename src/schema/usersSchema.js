@@ -27,7 +27,7 @@ const createUsersTable = () => {
 }
 
 // createUsersTable()
-// changeRole(1, 'admin')
+// changeRole(1, 'user')
 
 if (process.env.DEV === 'true') {
   knex.schema

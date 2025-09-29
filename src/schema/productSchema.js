@@ -45,5 +45,4 @@ if (process.env.DEV === 'true') {
   createProductsTable()
 }
 
-
-module.exports = knex
+module.exports = { knex, createProductsTable }

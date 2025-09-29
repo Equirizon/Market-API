@@ -38,7 +38,7 @@ const authController = {
             token: refreshToken,
             expiresIn: refreshExpiresIn,
             expiresOn: refreshExpiresOn,
-          } = generateToken(userPayload, process.env.REFRESH_TOKEN_SECRET, '1h')
+          } = generateToken(userPayload, process.env.REFRESH_TOKEN_SECRET, process.env.REFRESH_TOKEN_EXPIRATION || '1d')
           await authModel.saveRefreshToken(user.email, refreshToken, refreshExpiresOn)
           res.status(200).json({
             message: 'Login successful',
