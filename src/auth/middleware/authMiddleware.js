@@ -1,4 +1,4 @@
-const knex = require('../../schema/usersSchema.js')
+const knex = require('../../db/knex.js')
 
 const roleMiddleware = async (req, res, next) => {
   const { email } = req.user

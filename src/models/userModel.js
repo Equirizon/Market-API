@@ -1,4 +1,4 @@
-const knex = require('../schema/usersSchema.js')
+const knex = require('../db/knex.js')
 
 // User Model
 const userModel = {

@@ -1,5 +1,4 @@
-const knex = require('../schema/ordersSchema.js')
-require('../schema/orderItemsSchema.js')
+const knex = require('../db/knex.js')
 
 const ordersModel = {
   // Checkout transaction

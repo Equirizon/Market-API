@@ -1,4 +1,4 @@
-const { knex } = require('../schema/productSchema.js')
+const knex = require('../db/knex.js')
 
 // Product Model
 const productModel = {

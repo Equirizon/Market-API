@@ -1,4 +1,4 @@
-const knex = require('../schema/cartSchema.js')
+const knex = require('../db/knex.js')
 
 const cart = {
   async viewCart(id) {

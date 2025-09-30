@@ -1,42 +1,17 @@
 const request = require('supertest')
 const app = require('../src/index.js')
-const { knex, createProductsTable } = require('../src/schema/productSchema.js')
-const changeRole = require('../src/utils/changeRole.js')
+const knex = require('../src/db/knex.js')
 const createTestScenario = require('../src/utils/createTestScenario.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
-  await knex.schema
-    .dropTableIfExists('products')
-    .then(() => {
-      console.info('Products table dropped')
-    })
-    .catch((err) => {
-      console.error({ type: 'error', message: 'Error dropping products table: ' + err.message })
-    })
-    .finally(createProductsTable)
+  // await knex.migrate.rollback({}, true) // rollback all
+  await knex.migrate.latest()
+  await knex.seed.run()
 })
 
 afterAll(async () => {
-  await knex.schema
-    .dropTableIfExists('products')
-    .then(() => {
-      console.info('Products table dropped')
-    })
-    .catch((err) => {
-      console.error({ type: 'error', message: 'Error dropping products table: ' + err.message })
-    })
-    .finally(createProductsTable)
-  return await new Promise((resolve, reject) => {
-    setTimeout(async () => {
-      try {
-        await knex.destroy()
-        resolve()
-      } catch (error) {
-        reject(err)
-      }
-    }, 500)
-  })
+  await knex.destroy()
 })
 
 // GET methods are public thus not requiring scenarios

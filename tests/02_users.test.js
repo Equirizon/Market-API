@@ -1,21 +1,17 @@
 const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
-const changeRole = require('../src/utils/changeRole.js')
 const createTestScenario = require('../src/utils/createTestScenario.js')
 const token = process.env.TEST_TOKEN
 
-beforeAll((done) => {
-  done()
+beforeAll(async () => {
+  // await knex.migrate.rollback({}, true) // rollback all
+  await knex.migrate.latest()
+  await knex.seed.run()
 })
 
 afterAll(async () => {
-  return await new Promise((resolve, _reject) => {
-    setTimeout(() => {
-      knex.destroy()
-      return resolve()
-    }, 500)
-  })
+  await knex.destroy()
 })
 
 const { loopTestScenarios } = createTestScenario(app, token)

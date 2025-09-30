@@ -1,21 +1,17 @@
 const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
-const changeRole = require('../src/utils/changeRole.js')
-const createTestScenario = require('../src/utils/createTestScenario.js')
+// const createTestScenario = require('../src/utils/createTestScenario.js')
 const token = process.env.TEST_TOKEN
 
-beforeAll((done) => {
-  done()
+beforeAll(async () => {
+  await knex.migrate.rollback({}, true) // rollback all
+  await knex.migrate.latest()
+  await knex.seed.run()
 })
 
 afterAll(async () => {
-  return await new Promise((resolve, _reject) => {
-    setTimeout(() => {
-      knex.destroy()
-      return resolve()
-    }, 500)
-  })
+  await knex.destroy()
 })
 
 describe('api/v1/users/profile', () => {
@@ -25,7 +21,7 @@ describe('api/v1/users/profile', () => {
       email: 'equirizon@gmail.com',
       password: '1592753',
     }
-    // test('regsterUser()')
+    // test('registerUser()')
   })
   describe('Authentication checks', () => {
     test('should respond with 401 status code and a string containing "User needs to be logged in" if user is not logged in', async () => {
