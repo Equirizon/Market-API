@@ -18,7 +18,6 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await changeRole(1, 'user') // should default to user privileges
   await knex.schema
     .dropTableIfExists('products')
     .then(() => {
@@ -88,7 +87,7 @@ describe('POST api/v1/products (admin)', () => {
       ],
     },
   ]
-  loopTestScenarios(scenarios, 'post', newProduct, 'json')
+  loopTestScenarios(scenarios, 'post', 'json', newProduct)
 })
 
 describe('GET api/v1/products', () => {
@@ -162,7 +161,7 @@ describe('PUT api/v1/products/:id (admin)', () => {
     },
   ]
 
-  loopTestScenarios(scenarios, 'put', updatedProduct, 'json')
+  loopTestScenarios(scenarios, 'put', 'json', updatedProduct)
 
   describe('GET api/v1/products/:id after update', () => {
     test('listProducts() should respond with an status code of 200 and array of updated product objects in json', async () => {
@@ -204,7 +203,7 @@ describe('DELETE api/v1/products/:id (admin)', () => {
     },
   ]
 
-  loopTestScenarios(scenarios, 'delete', null, 'json')
+  loopTestScenarios(scenarios, 'delete', 'json')
 
   describe('GET api/v1/products/:id after delete', () => {
     test('deleteProduct: check whether the product is deleted from the database', async () => {

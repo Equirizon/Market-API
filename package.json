@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose",
+    "test": "jest --verbose --runInBand --testSequencer=./tests/testSequencer.js",
     "dev": "nodemon src/index.js"
   },
   "keywords": [],

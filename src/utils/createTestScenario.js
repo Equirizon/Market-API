@@ -28,7 +28,6 @@ const changeRole = require('./changeRole.js')
 const createTestScenario = (app, token) => {
   let appInstance = app
   let tokenInstance = token || '<token>'
-
   return {
     setApp(app) {
       appInstance = app
@@ -36,10 +35,10 @@ const createTestScenario = (app, token) => {
     setToken(token) {
       tokenInstance = token
     },
-    loopTestScenarios(scenarios, method, data, headerType = 'json') {
+    loopTestScenarios(scenarios, method, headerType = 'json', data) {
       scenarios.forEach((scenario) => {
         test(scenario.test, async () => {
-          await changeRole(1, scenario.client)
+          changeRole(1, scenario.client)
           let req = request(appInstance)[method](scenario.route).set('Authorization', `Bearer ${tokenInstance}`)
           if (data && /post|put|patch/i.test(method)) req = req.send(data)
           const response = await req
