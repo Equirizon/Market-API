@@ -2,12 +2,13 @@ const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
 const createTestScenario = require('../src/utils/createTestScenario.js')
+const authenticationChecks = require('../src/utils/authCheck.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
-  // await knex.migrate.rollback({}, true) // rollback all
+  // await knex.migrate.rollback({}, true)
   await knex.migrate.latest()
-  await knex.seed.run()
+  // await knex.seed.run() // commented assuming 01_auth test was ran
 })
 
 afterAll(async () => {
@@ -15,23 +16,9 @@ afterAll(async () => {
 })
 
 const { loopTestScenarios } = createTestScenario(app, token)
+const { checkAuth } = authenticationChecks(app)
 
 describe('api/v1/users', () => {
-  describe('Authentication checks', () => {
-    test('should respond with 401 status code and a string containing "User needs to be logged in" if user is not logged in', async () => {
-      const response = await request(app).post('/api/v1/products')
-      expect(response.statusCode).toBe(401)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-      expect(response.text).toBe('User needs to be logged in')
-    })
-    test('should respond with 403 status code and a string containing "Token is invalid or expired" if token is invalid or expired', async () => {
-      const response = await request(app).post('/api/v1/products').set('Authorization', `Bearer <token>`)
-      expect(response.statusCode).toBe(403)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-      expect(response.text).toBe('Token is invalid or expired')
-    })
-  })
-
   describe('GET api/v1/users', () => {
     const scenarios = [
       {
@@ -56,6 +43,27 @@ describe('api/v1/users', () => {
         ],
       },
     ]
+    scenarios.forEach((scenario) => {
+      describe(`Auth checks for "${scenario.client.toUpperCase()}" client type`, () => {
+        checkAuth(scenario.route, 'get')
+      })
+    })
     loopTestScenarios(scenarios, 'get')
+  })
+
+  describe('GET api/v1/users/profile', () => {
+    const route = '/api/v1/users/profile'
+    checkAuth(route, 'get')
+    test("getProfile() should respond with 200 status code and the logged in user's profile object in json", async () => {
+      const response = await request(app).get(route).set('Authorization', `Bearer ${token}`)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toHaveProperty('id', expect.any(Number))
+      expect(response.body).toHaveProperty('name', expect.any(String))
+      expect(response.body).toHaveProperty('email', expect.any(String))
+      expect(response.body).toHaveProperty('password', expect.any(String))
+      expect(response.body).toHaveProperty('role', expect.stringMatching(/^(admin|user)$/))
+      expect(response.body).toHaveProperty('created_at', expect.any(String))
+    })
   })
 })

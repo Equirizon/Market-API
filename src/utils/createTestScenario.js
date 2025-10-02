@@ -28,16 +28,17 @@ const changeRole = require('./changeRole.js')
 const createTestScenario = (app, token) => {
   let appInstance = app
   let tokenInstance = token || '<token>'
+  if (!token) console.error('Token not provided')
   return {
-    setApp(app) {
+    setAppInstance(app) {
       appInstance = app
     },
-    setToken(token) {
+    setTokenInstance(token) {
       tokenInstance = token
     },
     loopTestScenarios(scenarios, method, headerType = 'json', data) {
       scenarios.forEach((scenario) => {
-        test(scenario.test, async () => {
+        test(`${method.toUpperCase()} ${scenario.route} | ${scenario.test}`, async () => {
           changeRole({ email: 'equirizon@gmail.com' }, scenario.client)
           let req = request(appInstance)[method](scenario.route).set('Authorization', `Bearer ${tokenInstance}`)
           if (data && /post|put|patch/i.test(method)) req = req.send(data)

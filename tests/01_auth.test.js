@@ -1,54 +1,105 @@
 const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
-// const createTestScenario = require('../src/utils/createTestScenario.js')
+const authenticationChecks = require('../src/utils/authCheck.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
   await knex.migrate.rollback({}, true) // rollback all
   await knex.migrate.latest()
-  await knex.seed.run()
 })
 
 afterAll(async () => {
   await knex.destroy()
 })
 
-describe('api/v1/users/profile', () => {
-  describe('POST', () => {
+const { checkAuth } = authenticationChecks(app)
+
+describe('api/v1/auth/', () => {
+  let refreshToken = null
+  describe('POST api/v1/auth/register', () => {
     const userProfile = {
       username: 'Equirizon',
       email: 'equirizon@gmail.com',
       password: '1592753',
     }
-    // test('registerUser()')
-  })
-  describe('Authentication checks', () => {
-    test('should respond with 401 status code and a string containing "User needs to be logged in" if user is not logged in', async () => {
-      const response = await request(app).get('/api/v1/users/profile')
-      expect(response.statusCode).toBe(401)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-      expect(response.text).toBe('User needs to be logged in')
+    test('registerUser() should respond with 201 status code and a user object in json', async () => {
+      const response = await request(app).post('/api/v1/auth/register').send(userProfile)
+      expect(response.statusCode).toBe(201)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(response.body).toHaveProperty('id', expect.any(Number))
+      expect(response.body).toHaveProperty('name', userProfile.username)
+      expect(response.body).toHaveProperty('email', userProfile.email)
+      expect(response.body).toHaveProperty('message', 'User registered successfully')
     })
-    test('should respond with 403 status code and a string containing "Token is invalid or expired" if token is invalid or expired', async () => {
-      const response = await request(app).get('/api/v1/users/profile').set('Authorization', `Bearer <token>`)
-      expect(response.statusCode).toBe(403)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-      expect(response.text).toBe('Token is invalid or expired')
+    test('registerUser() should respond with 500 status code since we already created that user', async () => {
+      const response = await request(app).post('/api/v1/auth/register').send(userProfile)
+      expect(response.statusCode).toBe(500)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(response.body).toHaveProperty('error', 'Email already been used')
     })
   })
 
-  describe('GET api/v1/users/profile', () => {
-    test("getProfile() should respond with 200 status code and the logged in user's profile object in json", async () => {
-      const response = await request(app).get('/api/v1/users/profile').set('Authorization', `Bearer ${token}`)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+  describe('POST api/v1/auth/login', () => {
+    test('login() should respond with 200 status code with an object containing both access and refresh JWT tokens in json', async () => {
+      const loginCredentials = {
+        email: 'equirizon@gmail.com',
+        password: '1592753',
+      }
+      const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
+      const anyJwtToken = expect.stringMatching(jwtRegex)
+      const response = await request(app).post('/api/v1/auth/login').send(loginCredentials)
       expect(response.statusCode).toBe(200)
-      expect(response.body).toHaveProperty('id', expect.any(Number))
-      expect(response.body).toHaveProperty('name', expect.any(String))
-      expect(response.body).toHaveProperty('email', expect.any(String))
-      expect(response.body).toHaveProperty('password', expect.any(String))
-      expect(response.body).toHaveProperty('role', expect.stringMatching(/^(admin|user)$/))
-      expect(response.body).toHaveProperty('created_at', expect.any(String))
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(response.body).toHaveProperty('message', 'Login successful')
+      expect(response.body).toHaveProperty('accessToken', anyJwtToken)
+      expect(response.body).toHaveProperty('refreshToken', anyJwtToken)
+      refreshToken = response.body.refreshToken
+    })
+    test('login() should respond with 401 status code with an object containing error message in json if credentials are incorrect', async () => {
+      const invalidLoginCredentials = {
+        email: 'equirizon@gmail.com',
+        password: 'wrong_password',
+      }
+      const response = await request(app).post('/api/v1/auth/login').send(invalidLoginCredentials)
+      expect(response.statusCode).toBe(401)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(response.body).toHaveProperty('error', 'Email or Password is incorrect')
+    })
+  })
+
+  describe('POST api/v1/auth/refresh', () => {
+    test('refreshToken() should respond with 201 status code and an object containing new access token in json if the supplied refresh token is valid', async () => {
+      const token = {
+        token: refreshToken,
+      }
+      const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
+      const anyJwtToken = expect.stringMatching(jwtRegex)
+      const response = await request(app).post('/api/v1/auth/refresh').send(token)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
+      expect(response.statusCode).toBe(201)
+      expect(response.body).toHaveProperty('newAccessToken', anyJwtToken)
+      expect(response.body).toHaveProperty('message')
+    })
+    test('refreshToken() should respond with 403 status code and a string containing "Forbidden" if the supplied refresh token is invalid', async () => {
+      const token = {
+        token: '<token>',
+      }
+      const response = await request(app).post('/api/v1/auth/refresh').send(token)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
+      expect(response.statusCode).toBe(403)
+      expect(response.text).toBe('Forbidden')
+    })
+  })
+
+  describe('DELETE api/v1/auth/logout', () => {
+    const route = '/api/v1/auth/logout'
+
+    checkAuth(route, 'delete')
+
+    test('delete() should respond with 204 status code if user logged out successfully', async () => {
+      const response = await request(app).delete(route).set('Authorization', `Bearer ${token}`)
+      expect(response.statusCode).toBe(204)
     })
   })
 })

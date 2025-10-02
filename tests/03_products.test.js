@@ -2,39 +2,23 @@ const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
 const createTestScenario = require('../src/utils/createTestScenario.js')
+const authenticationChecks = require('../src/utils/authCheck.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
-  // await knex.migrate.rollback({}, true) // rollback all
+  // await knex.migrate.rollback({}, true)
   await knex.migrate.latest()
-  await knex.seed.run()
+  // await knex.seed.run() // commented assuming 01_auth test was ran
 })
 
 afterAll(async () => {
   await knex.destroy()
 })
 
-// GET methods are public thus not requiring scenarios
+// GET methods are public thus not requiring createTestScenario()
 
-const { /* setApp, setToken, */ loopTestScenarios } = createTestScenario(app, token)
-
-// setApp(app)
-// setToken(token)
-
-describe('Authentication checks', () => {
-  test('should respond with 401 status code and a string containing "User needs to be logged in" if user is not logged in', async () => {
-    const response = await request(app).post('/api/v1/products')
-    expect(response.statusCode).toBe(401)
-    expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-    expect(response.text).toBe('User needs to be logged in')
-  })
-  test('should respond with 403 status code and a string containing "Token is invalid or expired" if token is invalid or expired', async () => {
-    const response = await request(app).post('/api/v1/products').set('Authorization', `Bearer <token>`)
-    expect(response.statusCode).toBe(403)
-    expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-    expect(response.text).toBe('Token is invalid or expired')
-  })
-})
+const { loopTestScenarios } = createTestScenario(app, token)
+const { checkAuth } = authenticationChecks(app)
 
 describe('POST api/v1/products (admin)', () => {
   const newProduct = {
@@ -62,10 +46,16 @@ describe('POST api/v1/products (admin)', () => {
       ],
     },
   ]
+
+  scenarios.forEach((scenario) => {
+    describe(`Auth checks for "${scenario.client.toUpperCase()}" client type`, () => {
+      checkAuth(scenario.route, 'post')
+    })
+  })
   loopTestScenarios(scenarios, 'post', 'json', newProduct)
 })
 
-describe('GET api/v1/products', () => {
+describe('GET api/v1/products (public)', () => {
   test('listProducts() should respond with an status code of 200 and array of products objects in json', async () => {
     const response = await request(app).get('/api/v1/products')
     expect(response.statusCode).toBe(200)
@@ -82,7 +72,7 @@ describe('GET api/v1/products', () => {
   })
 })
 
-describe('GET api/v1/products/:id', () => {
+describe('GET api/v1/products/:id (public)', () => {
   test('should respond with 200 status code if product is present', async () => {
     const response = await request(app).get('/api/v1/products/1')
     expect(response.statusCode).toBe(200)
@@ -129,16 +119,21 @@ describe('PUT api/v1/products/:id (admin)', () => {
     },
     {
       client: 'admin',
-      test: 'updateProduct: should respond with 200 status code with message containing json',
+      test: 'updateProduct: should respond with 200 status code with message containing json if product is successfully updated',
       route: '/api/v1/products/1',
       response: 200,
       body: [['message', `Product ${updatedProduct.name} updated`]],
     },
   ]
 
+  scenarios.forEach((scenario) => {
+    describe(`Auth checks for "${scenario.client.toUpperCase()}" client type`, () => {
+      checkAuth(scenario.route, 'put')
+    })
+  })
   loopTestScenarios(scenarios, 'put', 'json', updatedProduct)
 
-  describe('GET api/v1/products/:id after update', () => {
+  describe('GET api/v1/products/:id after update (public)', () => {
     test('listProducts() should respond with an status code of 200 and array of updated product objects in json', async () => {
       const response = await request(app).get('/api/v1/products/1')
       expect(response.statusCode).toBe(200)
@@ -178,9 +173,14 @@ describe('DELETE api/v1/products/:id (admin)', () => {
     },
   ]
 
+  scenarios.forEach((scenario) => {
+    describe(`Auth checks for "${scenario.client.toUpperCase()}" client type`, () => {
+      checkAuth(scenario.route, 'delete')
+    })
+  })
   loopTestScenarios(scenarios, 'delete', 'json')
 
-  describe('GET api/v1/products/:id after delete', () => {
+  describe('GET api/v1/products/:id after delete (public)', () => {
     test('deleteProduct: check whether the product is deleted from the database', async () => {
       const response = await request(app).get('/api/v1/products/1')
       expect(response.statusCode).toBe(404)

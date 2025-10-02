@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --verbose --runInBand --testSequencer=./tests/testSequencer.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "login": "node ./scripts/getAccessToken.js"
   },
   "keywords": [],
   "author": "",

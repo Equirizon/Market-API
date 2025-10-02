@@ -1,4 +1,5 @@
 const knex = require('../../db/knex.js')
+const logDev = require('../../utils/devLogging.js')
 
 const roleMiddleware = async (req, res, next) => {
   const { email } = req.user
@@ -9,7 +10,11 @@ const roleMiddleware = async (req, res, next) => {
   if (user.role !== 'admin') {
     return res.status(403).json({ error: 'Request requires admin privileges' })
   }
-  console.info(`Admin ${user.name} request accepted.`)
+  try {
+    logDev(`Admin ${user.name} request accepted.`)
+  } catch (error) {
+    console.error(error.message)
+  }
   next()
 }
 

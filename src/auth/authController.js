@@ -21,13 +21,14 @@ const authController = {
     try {
       const { email, password } = req.body
       const user = await authModel.getUserByEmail(email)
-      const result = await authModel.revokeRefreshToken(email)
-      if (result) logDev('Old refresh token revoked on new login.')
       if (!user) {
         return res.status(401).json({ error: 'Email or Password is incorrect' })
       }
       bcrypt.compare(password, user.password, async (_err, result) => {
         if (result) {
+          // if login success, revoke old refresh token
+          const result = await authModel.revokeRefreshToken(email)
+          if (result) logDev('Old refresh token revoked on new login.')
           const userPayload = { name: user.name, email: user.email, id: user.id }
           const {
             token: accessToken,
