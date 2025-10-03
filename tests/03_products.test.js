@@ -6,7 +6,6 @@ const authenticationChecks = require('../src/utils/authCheck.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
-  // await knex.migrate.rollback({}, true)
   await knex.migrate.latest()
   // await knex.seed.run() // commented assuming 01_auth test was ran
 })
@@ -15,9 +14,10 @@ afterAll(async () => {
   await knex.destroy()
 })
 
-// GET methods are public thus not requiring createTestScenario()
+// GET endpoints return the same result regardless of client type,
+// so we don't need to set up a custom test scenario with createTestScenario().
 
-const { loopTestScenarios } = createTestScenario(app, token)
+const { testClientType } = createTestScenario(app, token)
 const { checkAuth } = authenticationChecks(app)
 
 describe('POST api/v1/products (admin)', () => {
@@ -52,7 +52,7 @@ describe('POST api/v1/products (admin)', () => {
       checkAuth(scenario.route, 'post')
     })
   })
-  loopTestScenarios(scenarios, 'post', 'json', newProduct)
+  testClientType(scenarios, 'post', 'json', newProduct)
 })
 
 describe('GET api/v1/products (public)', () => {
@@ -131,7 +131,7 @@ describe('PUT api/v1/products/:id (admin)', () => {
       checkAuth(scenario.route, 'put')
     })
   })
-  loopTestScenarios(scenarios, 'put', 'json', updatedProduct)
+  testClientType(scenarios, 'put', 'json', updatedProduct)
 
   describe('GET api/v1/products/:id after update (public)', () => {
     test('listProducts() should respond with an status code of 200 and array of updated product objects in json', async () => {
@@ -178,7 +178,7 @@ describe('DELETE api/v1/products/:id (admin)', () => {
       checkAuth(scenario.route, 'delete')
     })
   })
-  loopTestScenarios(scenarios, 'delete', 'json')
+  testClientType(scenarios, 'delete', 'json')
 
   describe('GET api/v1/products/:id after delete (public)', () => {
     test('deleteProduct: check whether the product is deleted from the database', async () => {

@@ -30,11 +30,10 @@ const req = http.request(options, (res) => {
         if (fs.existsSync('.env')) {
           envContent = fs.readFileSync('.env', 'utf8')
           envContent = envContent.replace(/TEST_TOKEN=.*/g, '')
-          console.log(envContent)
         }
         envContent += `TEST_TOKEN=${response.accessToken}`
         fs.writeFileSync('.env', envContent.trim())
-        console.log('ACCESS_TOKEN updated in .env')
+        console.log(`ACCESS_TOKEN updated in .env\n\ntoken: ${response.accessToken}`)
       } else {
         console.error('accessToken not found in response')
       }
@@ -45,7 +44,7 @@ const req = http.request(options, (res) => {
 })
 
 req.on('error', (e) => {
-  console.error(`Problem with request: ${e.message}`)
+  console.error(`Problem with request: ${e}`)
 })
 
 req.write(data)

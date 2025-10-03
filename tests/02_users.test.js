@@ -6,7 +6,6 @@ const authenticationChecks = require('../src/utils/authCheck.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
-  // await knex.migrate.rollback({}, true)
   await knex.migrate.latest()
   // await knex.seed.run() // commented assuming 01_auth test was ran
 })
@@ -15,7 +14,7 @@ afterAll(async () => {
   await knex.destroy()
 })
 
-const { loopTestScenarios } = createTestScenario(app, token)
+const { testClientType } = createTestScenario(app, token)
 const { checkAuth } = authenticationChecks(app)
 
 describe('api/v1/users', () => {
@@ -48,7 +47,7 @@ describe('api/v1/users', () => {
         checkAuth(scenario.route, 'get')
       })
     })
-    loopTestScenarios(scenarios, 'get')
+    testClientType(scenarios, 'get')
   })
 
   describe('GET api/v1/users/profile', () => {

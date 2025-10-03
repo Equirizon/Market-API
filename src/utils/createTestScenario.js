@@ -36,7 +36,7 @@ const createTestScenario = (app, token) => {
     setTokenInstance(token) {
       tokenInstance = token
     },
-    loopTestScenarios(scenarios, method, headerType = 'json', data) {
+    testClientType(scenarios, method, headerType = 'json', data) {
       scenarios.forEach((scenario) => {
         test(`${method.toUpperCase()} ${scenario.route} | ${scenario.test}`, async () => {
           changeRole({ email: 'equirizon@gmail.com' }, scenario.client)
