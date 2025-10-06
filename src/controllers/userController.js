@@ -2,7 +2,7 @@ const userModel = require('../models/userModel.js')
 
 const userController = {
   // admin
-  async getUsers(req, res) {
+  async getUsers(_req, res) {
     try {
       const users = await userModel.getUsers()
       if (!users.length) {
