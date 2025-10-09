@@ -1,6 +1,7 @@
 const knex = require('../../db/knex.js')
 const logDev = require('../../utils/devLogging.js')
 
+// used after authenticateToken middleware
 const roleMiddleware = async (req, res, next) => {
   const { email } = req.user
   const user = await knex.from('users').where({ email }).first()

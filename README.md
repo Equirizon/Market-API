@@ -40,7 +40,9 @@ To get started with the Market API, follow these steps:
 - [x] Add role based authentication (e.g., define roles such as 'admin' and 'user'; 'admin' can manage market data and users, 'user' can view and trade market data)
 - [x] Create an Auth middleware (e.g., JWT-based) to protect all API endpoints
 - [x] Automated tests (Jest)
-- [ ] Zod for input validation
+- [x] Zod for input validation
+- [ ] Documentation (Swagger)
+- [ ] Dockerize the application
 <!-- ## License -->
 
 <!-- This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->

@@ -22,6 +22,7 @@ const changeRole = async ({ id, email }, role) => {
   const [user] = await query.update({ role }, ['role', 'name'])
   if (!user) throw new Error('User not found, try seeding the db with init_data first')
   logDev(`Set ${user.name}'s role to ${user.role}.`)
+  return user.role
 }
 
 module.exports = changeRole

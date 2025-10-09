@@ -2,6 +2,7 @@ const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
 const authenticationChecks = require('../src/utils/authCheck.js')
+const { badRequestchecks } = require('../src/utils/checkBadRequest.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
@@ -14,6 +15,7 @@ afterAll(async () => {
 })
 
 const { checkAuth } = authenticationChecks(app)
+const { checkBadRequest } = badRequestchecks(app)
 
 describe('api/v1/auth/', () => {
   let refreshToken = null
@@ -22,6 +24,11 @@ describe('api/v1/auth/', () => {
       username: 'Equirizon',
       email: 'equirizon@gmail.com',
       password: '1592753',
+    }
+    const incorrectSyntax = {
+      name: 'Equirizon',
+      mail: 'equirizon@gmail.com',
+      passwords: 164375,
     }
     test('registerUser() should respond with 201 status code and a user object in json', async () => {
       const response = await request(app).post('/api/v1/auth/register').send(userProfile)
@@ -38,9 +45,16 @@ describe('api/v1/auth/', () => {
       expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
       expect(response.body).toHaveProperty('error', 'Email already been used')
     })
+    // 400 path tests
+    checkBadRequest('/api/v1/auth/register', 'post', incorrectSyntax)
   })
 
   describe('POST api/v1/auth/login', () => {
+    const incorrectSyntax = {
+      name: 'Equirizon',
+      mail: 'equirizon@gmail.com',
+      passwords: 164375,
+    }
     test('login() should respond with 200 status code with an object containing both access and refresh JWT tokens in json', async () => {
       const loginCredentials = {
         email: 'equirizon@gmail.com',
@@ -66,9 +80,14 @@ describe('api/v1/auth/', () => {
       expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
       expect(response.body).toHaveProperty('error', 'Email or Password is incorrect')
     })
+    // 400 path tests
+    checkBadRequest('/api/v1/auth/login', 'post', incorrectSyntax)
   })
 
   describe('POST api/v1/auth/refresh', () => {
+    const incorrectSyntax = {
+      notToken: refreshToken,
+    }
     test('refreshToken() should respond with 201 status code and an object containing new access token in json if the supplied refresh token is valid', async () => {
       const token = {
         token: refreshToken,
@@ -76,8 +95,8 @@ describe('api/v1/auth/', () => {
       const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
       const anyJwtToken = expect.stringMatching(jwtRegex)
       const response = await request(app).post('/api/v1/auth/refresh').send(token)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
       expect(response.statusCode).toBe(201)
+      expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
       expect(response.body).toHaveProperty('newAccessToken', anyJwtToken)
       expect(response.body).toHaveProperty('message')
     })
@@ -90,6 +109,8 @@ describe('api/v1/auth/', () => {
       expect(response.statusCode).toBe(403)
       expect(response.text).toBe('Forbidden')
     })
+    // 400 path tests
+    checkBadRequest('/api/v1/auth/login', 'post', incorrectSyntax)
   })
 
   describe('DELETE api/v1/auth/logout', () => {

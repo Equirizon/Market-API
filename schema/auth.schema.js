@@ -1,15 +1,16 @@
 const z = require('zod')
 
-const registerSchema = z.object({ username: z.string(), email: z.email(), password: z.string() })
+const RegisterSchema = z.object({ username: z.string(), email: z.email(), password: z.string() })
 
-const loginSchema = z.strictObject({ email: z.email(), password: z.string() })
+const LoginSchema = z.strictObject({ email: z.email(), password: z.string() })
 
-const userPayloadSchema = z.strictObject({ name: z.string(), email: z.email(), id: z.number() })
+const UserPayloadSchema = z.strictObject({ name: z.string(), email: z.email(), id: z.number() })
 
-const jwtSchema = z.string().regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+// const jwtSchema = z.string().regex(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+const JWTSchema = z.jwt()
 
-const refreshTokenSchema = z.object({
-  token: jwtSchema,
+const RefreshTokenSchema = z.object({
+  token: JWTSchema,
 })
 
-module.exports = { registerSchema, loginSchema, userPayloadSchema, refreshTokenSchema, z }
+module.exports = { RegisterSchema, LoginSchema, UserPayloadSchema, RefreshTokenSchema, z }

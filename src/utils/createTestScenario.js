@@ -1,27 +1,30 @@
 /**
- * Creates a test scenario utility for running API endpoint tests with dynamic app and token instances.
+ * Creates a test scenario utility for API endpoint testing.
  *
- * @param {import('express').Application} app - The Express application instance to test against.
- * @param {string} token - The authentication token to use in requests.
+ * @param {Object} app - The Express application instance.
+ * @param {string} [token] - The authentication token to use for requests.
  * @returns {{
- *   setApp: (app: import('express').Application) => void,
- *   setToken: (token: string) => void,
- *   loopTestScenarios: (
+ *   setAppInstance: (app: Object) => void,
+ *   setTokenInstance: (token: string) => void,
+ *   testClientTypes: (
  *     scenarios: Array<{
- *       test: string,
- *       client: any,
  *       route: string,
+ *       test: string,
+ *       client: string,
  *       response: number,
- *       body: any,
+ *       body: Array<[string, any]> | string,
+ *       badSyntax?: Object
  *     }>,
  *     method: string,
- *     data?: any,
- *     headerType?: string
+ *     headerType?: string,
+ *     data?: Object
  *   ) => void
  * }}
- *   An object with methods to set the app/token and loop through test scenarios.
+ *
+ * @example
+ * const tester = createTestScenario(app, token);
+ * tester.testClientTypes([...], 'post', 'json', { foo: 'bar' });
  */
-
 const request = require('supertest')
 const changeRole = require('./changeRole.js')
 
@@ -36,10 +39,12 @@ const createTestScenario = (app, token) => {
     setTokenInstance(token) {
       tokenInstance = token
     },
-    testClientType(scenarios, method, headerType = 'json', data) {
+    testClientTypes(scenarios, method, headerType = 'json', data) {
       scenarios.forEach((scenario) => {
+        routeRegex = /^(\/.+)+$/g
+        if (!routeRegex.test(scenario.route)) throw new Error(`Invalid route: ${scenario.route}`)
         test(`${method.toUpperCase()} ${scenario.route} | ${scenario.test}`, async () => {
-          changeRole({ email: 'equirizon@gmail.com' }, scenario.client)
+          await changeRole({ email: 'equirizon@gmail.com' }, scenario.client)
           let req = request(appInstance)[method](scenario.route).set('Authorization', `Bearer ${tokenInstance}`)
           if (data && /post|put|patch/i.test(method)) req = req.send(data)
           const response = await req
@@ -60,6 +65,33 @@ const createTestScenario = (app, token) => {
           if (headerType === 'text') {
             expect(response.text).toBe(scenario.body)
           }
+        })
+        // checks for 400 on POST requests
+        if (!scenario.badSyntax) return
+        describe(`Bad request checks on ${method.toUpperCase()} ${scenario.route}`, () => {
+          test(`${method.toUpperCase()} ${
+            scenario.route
+          } should respond with 400 status code if the body have incorrect syntax`, async () => {
+            await changeRole({ email: 'equirizon@gmail.com' }, scenario.client)
+            const response = await request(appInstance)
+              [method](scenario.route)
+              .set('Authorization', `Bearer ${tokenInstance}`)
+              .send(scenario.badSyntax)
+            expect(response.statusCode).toBe(400)
+            expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
+            expect(response.text).toStrictEqual(expect.any(String))
+          })
+          test(`${method.toUpperCase()} ${
+            scenario.route
+          } should respond with 400 status code if there were no body provided`, async () => {
+            await changeRole({ email: 'equirizon@gmail.com' }, scenario.client)
+            const response = await request(appInstance)
+              [method](scenario.route)
+              .set('Authorization', `Bearer ${tokenInstance}`)
+            expect(response.statusCode).toBe(400)
+            expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
+            expect(response.text).toStrictEqual(expect.any(String))
+          })
         })
       })
     },

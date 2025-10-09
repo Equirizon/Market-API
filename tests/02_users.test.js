@@ -14,7 +14,7 @@ afterAll(async () => {
   await knex.destroy()
 })
 
-const { testClientType } = createTestScenario(app, token)
+const { testClientTypes } = createTestScenario(app, token)
 const { checkAuth } = authenticationChecks(app)
 
 describe('api/v1/users', () => {
@@ -36,7 +36,7 @@ describe('api/v1/users', () => {
           ['id', expect.any(Number)],
           ['name', expect.any(String)],
           ['email', expect.any(String)],
-          ['password', expect.any(String)],
+          // ['password', expect.any(String)],
           ['role', expect.any(String)],
           ['created_at', expect.any(String)],
         ],
@@ -47,7 +47,7 @@ describe('api/v1/users', () => {
         checkAuth(scenario.route, 'get')
       })
     })
-    testClientType(scenarios, 'get')
+    testClientTypes(scenarios, 'get')
   })
 
   describe('GET api/v1/users/profile', () => {
@@ -60,7 +60,7 @@ describe('api/v1/users', () => {
       expect(response.body).toHaveProperty('id', expect.any(Number))
       expect(response.body).toHaveProperty('name', expect.any(String))
       expect(response.body).toHaveProperty('email', expect.any(String))
-      expect(response.body).toHaveProperty('password', expect.any(String))
+      // expect(response.body).toHaveProperty('password', expect.any(String))
       expect(response.body).toHaveProperty('role', expect.stringMatching(/^(admin|user)$/))
       expect(response.body).toHaveProperty('created_at', expect.any(String))
     })

@@ -2,6 +2,7 @@ const request = require('supertest')
 const app = require('../src/index.js')
 const knex = require('../src/db/knex.js')
 const authenticationChecks = require('../src/utils/authCheck.js')
+const { badRequestchecks } = require('../src/utils/checkBadRequest.js')
 const token = process.env.TEST_TOKEN
 
 beforeAll(async () => {
@@ -16,6 +17,7 @@ afterAll(async () => {
 // GET methods are public thus not requiring createTestScenario()
 
 const { checkAuth } = authenticationChecks(app)
+const { checkBadRequest } = badRequestchecks(app, token)
 
 describe('api/v1/cart', () => {
   describe('GET api/v1/cart', () => {
@@ -45,7 +47,6 @@ describe('api/v1/cart', () => {
       quantity: 6,
     }
     checkAuth(route, 'post')
-
     test('addToCart() should respond with 404 status code and an error message in json since the product does not exist', async () => {
       const response = await request(app).post(route).set('Authorization', `Bearer ${token}`).send(missingProduct)
       expect(response.statusCode).toBe(404)
@@ -59,12 +60,7 @@ describe('api/v1/cart', () => {
       expect(response.body).toHaveProperty('message', `Item #${product.productId} added to cart`)
       expect(response.body).toHaveProperty('cartItem', expect.any(Object))
     })
-    test('addToCart() should respond with 400 status code if the req.body is incorrect or missing', async () => {
-      const response = await request(app).post(route).set('Authorization', `Bearer ${token}`).send(invalidShape)
-      expect(response.statusCode).toBe(400)
-      expect(response.headers['content-type']).toEqual(expect.stringContaining('text'))
-      expect(response.text).toBe('Bad Request')
-    })
+    checkBadRequest(route, 'post', invalidShape)
   })
 
   describe('GET api/v1/cart', () => {

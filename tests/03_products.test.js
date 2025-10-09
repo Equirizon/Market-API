@@ -14,10 +14,10 @@ afterAll(async () => {
   await knex.destroy()
 })
 
-// GET endpoints return the same result regardless of client type,
-// so we don't need to set up a custom test scenario with createTestScenario().
+/* GET endpoints return the same result regardless of client type,
+so we don't need to set up a custom test scenario with createTestScenario(). */
 
-const { testClientType } = createTestScenario(app, token)
+const { testClientTypes } = createTestScenario(app, token)
 const { checkAuth } = authenticationChecks(app)
 
 describe('POST api/v1/products (admin)', () => {
@@ -26,6 +26,12 @@ describe('POST api/v1/products (admin)', () => {
     description: 'This is a test product',
     price: 9.99,
     stock: 100,
+  }
+  const incorrectSyntax = {
+    names: 1024,
+    describe: 'This is a test product',
+    prices: '9.99',
+    stocks: '100',
   }
   const scenarios = [
     {
@@ -37,22 +43,22 @@ describe('POST api/v1/products (admin)', () => {
     },
     {
       client: 'admin',
-      test: 'addProduct: should respond with 201 status code with id and message containing "Product <product> added" in json',
+      test: 'addProduct() should respond with 201 status code with id and message containing "Product <product> added" in json',
       route: '/api/v1/products/',
       response: 201,
       body: [
         ['id', expect.any(Number)],
         ['message', `Product ${newProduct.name} added`],
       ],
+      badSyntax: incorrectSyntax,
     },
   ]
-
   scenarios.forEach((scenario) => {
     describe(`Auth checks for "${scenario.client.toUpperCase()}" client type`, () => {
       checkAuth(scenario.route, 'post')
     })
   })
-  testClientType(scenarios, 'post', 'json', newProduct)
+  testClientTypes(scenarios, 'post', 'json', newProduct)
 })
 
 describe('GET api/v1/products (public)', () => {
@@ -73,7 +79,7 @@ describe('GET api/v1/products (public)', () => {
 })
 
 describe('GET api/v1/products/:id (public)', () => {
-  test('should respond with 200 status code if product is present', async () => {
+  test('getProduct() should respond with 200 status code if product is present', async () => {
     const response = await request(app).get('/api/v1/products/1')
     expect(response.statusCode).toBe(200)
   })
@@ -87,7 +93,7 @@ describe('GET api/v1/products/:id (public)', () => {
     expect(response.body).toHaveProperty('stock')
     expect(response.body).toHaveProperty('created_at')
   })
-  test('should respond with 404 status code is product is not present', async () => {
+  test('getProduct() should respond with 404 status code is product is not present', async () => {
     const response = await request(app).get('/api/v1/products/2')
     expect(response.statusCode).toBe(404)
     expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
@@ -102,27 +108,34 @@ describe('PUT api/v1/products/:id (admin)', () => {
     price: 19.99,
     stock: 50,
   }
+  const badProduct = {
+    product: 1,
+    describe: 'This is a malformed object',
+    price: '100',
+    stock: '0',
+  }
   const scenarios = [
     {
       client: 'user',
-      test: 'should respond with 403 status code if user is not an admin with an error message containing "Request requires admin privileges" in json',
+      test: 'updateProduct() should respond with 403 status code if user is not an admin with an error message containing "Request requires admin privileges" in json',
       route: '/api/v1/products/2',
       response: 403,
       body: [['error', 'Request requires admin privileges']],
     },
     {
       client: 'admin',
-      test: 'should respond with 404 status code if product to be updated is not present',
+      test: 'updateProduct() should respond with 404 status code if product to be updated is not present',
       route: '/api/v1/products/2',
       response: 404,
       body: [['error', `Product does not exist`]],
     },
     {
       client: 'admin',
-      test: 'updateProduct: should respond with 200 status code with message containing json if product is successfully updated',
+      test: 'updateProduct() should respond with 200 status code with message containing json if product is successfully updated',
       route: '/api/v1/products/1',
       response: 200,
       body: [['message', `Product ${updatedProduct.name} updated`]],
+      badSyntax: badProduct,
     },
   ]
 
@@ -131,7 +144,7 @@ describe('PUT api/v1/products/:id (admin)', () => {
       checkAuth(scenario.route, 'put')
     })
   })
-  testClientType(scenarios, 'put', 'json', updatedProduct)
+  testClientTypes(scenarios, 'put', 'json', updatedProduct)
 
   describe('GET api/v1/products/:id after update (public)', () => {
     test('listProducts() should respond with an status code of 200 and array of updated product objects in json', async () => {
@@ -178,7 +191,7 @@ describe('DELETE api/v1/products/:id (admin)', () => {
       checkAuth(scenario.route, 'delete')
     })
   })
-  testClientType(scenarios, 'delete', 'json')
+  testClientTypes(scenarios, 'delete', 'json')
 
   describe('GET api/v1/products/:id after delete (public)', () => {
     test('deleteProduct: check whether the product is deleted from the database', async () => {

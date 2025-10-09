@@ -16,6 +16,7 @@ const authRouter = require('./auth/auth.js')
 const cartRouter = require('./routes/cart.js')
 const productRouter = require('./routes/product.js')
 const ordersRouter = require('./routes/orders.js')
+const changeRole = require('./utils/changeRole.js')
 
 // Setup API Routes
 app.use('/api/v1/users', usersRouter)
@@ -27,5 +28,7 @@ app.use('/api/v1/orders', ordersRouter)
 app.listen(port, () => {
   logDev(`listening at http://localhost:${port}`)
 })
+
+// changeRole({ email: 'equirizon@gmail.com'}, 'admin')
 
 module.exports = app
