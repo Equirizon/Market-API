@@ -11,3 +11,4 @@ package-lock.json
 *.config.mjs
 *.db
 *.sqlite3
+openapi.json

@@ -39,9 +39,9 @@ describe('api/v1/auth/', () => {
       expect(response.body).toHaveProperty('email', userProfile.email)
       expect(response.body).toHaveProperty('message', 'User registered successfully')
     })
-    test('registerUser() should respond with 500 status code since we already created that user', async () => {
+    test('registerUser() should respond with 409 status code since we already created that user', async () => {
       const response = await request(app).post('/api/v1/auth/register').send(userProfile)
-      expect(response.statusCode).toBe(500)
+      expect(response.statusCode).toBe(409)
       expect(response.headers['content-type']).toEqual(expect.stringContaining('json'))
       expect(response.body).toHaveProperty('error', 'Email already been used')
     })

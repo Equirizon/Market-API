@@ -43,6 +43,14 @@ To get started with the Market API, follow these steps:
 - [x] Zod for input validation
 - [ ] Documentation (Swagger)
 - [ ] Dockerize the application
+
+### Future Enhancements
+
+- Implement rate limiting to prevent abuse
+- Product search and filtering options
+- Pagination for large datasets
+- Category and tagging system for market items
+
 <!-- ## License -->
 
 <!-- This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. -->

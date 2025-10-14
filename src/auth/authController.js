@@ -17,6 +17,9 @@ const authController = {
       if (error instanceof z.ZodError) {
         return res.status(400).send(z.prettifyError(error))
       }
+      if (error.message === 'Email already been used') {
+        return res.status(409).json({ error: error.message })
+      }
       res.status(500).json({ error: error.message })
     }
   },
