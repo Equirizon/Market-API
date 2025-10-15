@@ -16,7 +16,7 @@ const express = require('express')
 const app = express()
 const logDev = require('./utils/devLogging.js')
 const swaggerUi = require('swagger-ui-express')
-const openapiSpecification = require('../swagger-jsdoc.js')
+const openapiSpecification = require('../openapi/swagger.config.js')
 
 const port = process.env.PORT || 3000
 

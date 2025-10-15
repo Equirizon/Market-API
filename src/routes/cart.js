@@ -4,50 +4,73 @@
  *   get:
  *     tags:
  *       - Cart
- *     description: Get all items in the cart
+ *     summary: Retrieve all items in the cart
+ *     description: Returns a list of all items currently in the authenticated user's cart.
+ *     operationId: viewCart
+ *     security:
+ *       - JWTAuth: []
  *     responses:
  *       200:
- *         description: Returns a list of items in the cart.
+ *         $ref: '#components/schemas/Cart/get/responses/200'
  *       401:
- *         description: Unauthorized. Authentication is required.
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
- *         description: Forbidden. User does not have permission to access this resource.
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         description: Not Found. The specified resource could not be found. Cart is empty.
+ *         $ref: '#components/schemas/Cart/get/responses/404'
  *       500:
- *         description: Internal server error. Something went wrong.
+ *         $ref: '#/components/responses/InternalServerError'
  *   post:
  *     tags:
  *       - Cart
- *     description: Add a new item to the cart
+ *     summary: Add an item to the cart
+ *     description: Adds a new product to the authenticated user's cart.
+ *     operationId: addToCart
+ *     security:
+ *       - JWTAuth: []
+ *     requestBody:
+ *       $ref: '#components/schemas/Cart/post/requestBody'
  *     responses:
  *       201:
- *         description: Item added to cart successfully.
+ *         $ref: '#components/schemas/Cart/post/responses/201'
  *       400:
- *         description: Bad request. Invalid input.
+ *         $ref: '#components/schemas/Cart/post/responses/400'
  *       401:
- *         description: Unauthorized. Authentication is required.
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
- *         description: Forbidden. User does not have permission to perform this action.
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         description: Not Found. The product could not be found.
+ *         $ref: '#/components/schemas/Cart/post/responses/404'
  *       500:
- *         description: Internal server error. Something went wrong.
+ *         $ref: '#/components/responses/InternalServerError'
+ * /api/v1/cart/{id}:
  *   delete:
  *     tags:
  *       - Cart
- *     description: Remove an item from the cart
+ *     summary: Remove an item from the cart
+ *     description: Removes a specific item from the authenticated user's cart by item ID.
+ *     operationId: deleteCartItem
+ *     security:
+ *       - JWTAuth: []
+ *     parameters:
+ *         - in: path
+ *           name: id
+ *           required: true
+ *           description: The unique identifier of the cart item to be removed
+ *           schema:
+ *             type: integer
+ *             format: int64
  *     responses:
  *       200:
- *         description: Item removed from cart successfully.
+ *         $ref: '#/components/schemas/Cart/delete/responses/200'
  *       401:
- *         description: Unauthorized. Authentication is required.
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
- *         description: Forbidden. User does not have permission to perform this action.
+ *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         description: Not Found. The specified resource could not be found.
+ *         $ref: '#/components/schemas/Cart/delete/responses/404'
  *       500:
- *         description: Internal server error. Something went wrong.
+ *         $ref: '#/components/responses/InternalServerError'
  */
 const router = require('express').Router()
 const { viewCart, addToCart, deleteCartItem } = require('../controllers/cartController.js')

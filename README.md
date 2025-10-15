@@ -41,7 +41,7 @@ To get started with the Market API, follow these steps:
 - [x] Create an Auth middleware (e.g., JWT-based) to protect all API endpoints
 - [x] Automated tests (Jest)
 - [x] Zod for input validation
-- [ ] Documentation (Swagger)
+- [x] Documentation (Swagger)
 - [ ] Dockerize the application
 
 ### Future Enhancements

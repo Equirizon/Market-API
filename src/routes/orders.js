@@ -4,32 +4,46 @@
  *   get:
  *     tags:
  *       - Orders
- *     description: Get all orders for the authenticated user
+ *     summary: Retrieve all orders for the authenticated user
+ *     description: |
+ *       Returns a list of all orders associated with the authenticated user.
+ *       Requires a valid authentication token. Only orders belonging to the requesting user will be returned.
+ *     operationId: orders
+ *     security:
+ *       - JWTAuth: []
  *     responses:
  *       200:
- *         description: Returns a list of orders.
+ *         $ref: '#/components/schemas/Orders/get/responses/200'
  *       401:
- *         description: Unauthorized. Authentication is required.
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
- *         description: Forbidden. User does not have permission to access this resource.
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/schemas/Orders/get/responses/404'
  *       500:
- *         description: Internal server error. Something went wrong.
+ *         $ref: '#/components/responses/InternalServerError'
  * /api/v1/orders/checkout:
  *   get:
  *     tags:
  *       - Orders
- *     description: Checkout the cart and create an order
+ *     summary: Checkout the cart and create a new order
+ *     description: |
+ *       Processes the current user's cart and creates a new order.
+ *       Requires authentication. The cart must contain valid items.
+ *     operationId: checkout
+ *     security:
+ *       - JWTAuth: []
  *     responses:
  *       200:
- *         description: Order created successfully.
+ *         $ref: '#/components/schemas/Orders/Checkout/get/responses/200'
  *       400:
- *         description: Bad request. Invalid input or cart is empty.
+ *         $ref: '#/components/schemas/Orders/Checkout/get/responses/400'
  *       401:
- *         description: Unauthorized. Authentication is required.
+ *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
- *         description: Forbidden. User does not have permission to perform this action.
+ *         $ref: '#/components/responses/ForbiddenError'
  *       500:
- *         description: Internal server error. Something went wrong.
+ *         $ref: '#/components/responses/InternalServerError'
  */
 
 const router = require('express').Router()
