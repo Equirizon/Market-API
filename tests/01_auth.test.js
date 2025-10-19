@@ -23,7 +23,7 @@ describe('api/v1/auth/', () => {
     const userProfile = {
       username: 'Equirizon',
       email: 'equirizon@gmail.com',
-      password: '1592753',
+      password: 'reallyStrongPassword123',
     }
     const incorrectSyntax = {
       name: 'Equirizon',
@@ -58,7 +58,7 @@ describe('api/v1/auth/', () => {
     test('login() should respond with 200 status code with an object containing both access and refresh JWT tokens in json', async () => {
       const loginCredentials = {
         email: 'equirizon@gmail.com',
-        password: '1592753',
+        password: 'reallyStrongPassword123',
       }
       const jwtRegex = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
       const anyJwtToken = expect.stringMatching(jwtRegex)

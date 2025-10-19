@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /api/v1/cart:
+ * /cart:
  *   get:
  *     tags:
  *       - Cart
@@ -11,13 +11,13 @@
  *       - JWTAuth: []
  *     responses:
  *       200:
- *         $ref: '#components/schemas/Cart/get/responses/200'
+ *         $ref: '#/components/schemas/Cart/get/responses/200'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  *       404:
- *         $ref: '#components/schemas/Cart/get/responses/404'
+ *         $ref: '#/components/schemas/Cart/get/responses/404'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  *   post:
@@ -29,12 +29,12 @@
  *     security:
  *       - JWTAuth: []
  *     requestBody:
- *       $ref: '#components/schemas/Cart/post/requestBody'
+ *       $ref: '#/components/schemas/Cart/post/requestBody'
  *     responses:
  *       201:
- *         $ref: '#components/schemas/Cart/post/responses/201'
+ *         $ref: '#/components/schemas/Cart/post/responses/201'
  *       400:
- *         $ref: '#components/schemas/Cart/post/responses/400'
+ *         $ref: '#/components/schemas/Cart/post/responses/400'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
@@ -43,7 +43,7 @@
  *         $ref: '#/components/schemas/Cart/post/responses/404'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
- * /api/v1/cart/{id}:
+ * /cart/{id}:
  *   delete:
  *     tags:
  *       - Cart

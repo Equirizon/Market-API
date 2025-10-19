@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /api/v1/orders:
+ * /orders:
  *   get:
  *     tags:
  *       - Orders
@@ -22,7 +22,7 @@
  *         $ref: '#/components/schemas/Orders/get/responses/404'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
- * /api/v1/orders/checkout:
+ * /orders/checkout:
  *   get:
  *     tags:
  *       - Orders

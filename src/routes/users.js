@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /api/v1/users:
+ * /users:
  *   get:
  *     tags:
  *       - Users/Auth
@@ -16,7 +16,7 @@
  *         $ref: '#/components/responses/UnauthorizedError'
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
- * /api/v1/users/profile:
+ * /users/profile:
  *   get:
  *     tags:
  *       - Users/Auth

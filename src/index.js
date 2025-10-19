@@ -38,8 +38,19 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/cart', cartRouter)
 app.use('/api/v1/products', productRouter)
 app.use('/api/v1/orders', ordersRouter)
-// API documentation route
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
+
+/* 
+   API documentation route.
+   This API is self-documenting via swagger-jsdoc + nodemon. Docs update automatically.
+*/
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpecification, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Market API Docs',
+  })
+)
 
 app.listen(port, () => {
   logDev(`listening at http://localhost:${port}`)

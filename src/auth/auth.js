@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /api/v1/auth/register:
+ * /auth/register:
  *   post:
  *     tags:
  *       - Users/Auth
@@ -18,7 +18,7 @@
  *         $ref: '#/components/schemas/Auth/Register/responses/409'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
- * /api/v1/auth/login:
+ * /auth/login:
  *   post:
  *     tags:
  *       - Users/Auth
@@ -36,13 +36,13 @@
  *         $ref: '#/components/schemas/Auth/Login/responses/401'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
- * /api/v1/auth/refresh:
+ * /auth/refresh:
  *   post:
  *     tags:
  *       - Users/Auth
  *     summary: Refresh the access token
  *     description: Refresh the access token using a valid refresh token. The endpoint requires the refresh token to be sent in the request body.
- *     opeationId: refreshToken
+ *     operationId: refreshToken
  *     requestBody:
  *      $ref: '#/components/schemas/Auth/Refresh/requestBody'
  *     responses:
@@ -54,7 +54,7 @@
  *         $ref: '#/components/schemas/Auth/Refresh/responses/403'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
- * /api/v1/auth/logout:
+ * /auth/logout:
  *   delete:
  *     tags:
  *       - Users/Auth

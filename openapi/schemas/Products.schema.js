@@ -31,7 +31,8 @@ const Products = {
                       example: 30,
                     },
                     created_at: {
-                      type: 'integer',
+                      type: 'string',
+                      format: 'date-time',
                       example: '2023-01-01T00:00:00Z',
                     },
                   },
@@ -134,7 +135,8 @@ const Products = {
                       example: 30,
                     },
                     created_at: {
-                      type: 'integer',
+                      type: 'string',
+                      format: 'date-time',
                       example: '2023-01-01T00:00:00Z',
                     },
                   },

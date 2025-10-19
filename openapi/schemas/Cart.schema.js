@@ -36,7 +36,8 @@ const Cart = {
                       example: 10,
                     },
                     created_at: {
-                      type: 'integer',
+                      type: 'string',
+                      format: 'date-time',
                       example: '2023-01-01T00:00:00Z',
                     },
                   },
@@ -135,7 +136,7 @@ const Cart = {
         200: {
           description: 'Item removed from cart successfully.',
           content: {
-            'application/json:': {
+            'application/json': {
               schema: {
                 type: 'object',
                 properties: {

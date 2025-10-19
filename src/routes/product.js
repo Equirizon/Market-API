@@ -1,6 +1,6 @@
 /**
  * @openapi
- * /api/v1/products:
+ * /products:
  *   get:
  *     tags:
  *       - Products
@@ -37,7 +37,7 @@
  *         $ref: '#/components/responses/PrivilegeError'
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
- * /api/v1/products/{id}:
+ * /products/{id}:
  *   get:
  *     tags:
  *       - Products

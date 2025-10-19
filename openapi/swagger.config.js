@@ -2,11 +2,12 @@ const swaggerJsdoc = require('swagger-jsdoc')
 const components = require('./openapi.components')
 const fs = require('fs')
 const path = require('path')
+const port = process.env.PORT || 3000
 
 const options = {
   definition: {
     openapi: '3.0.4',
-    info: {
+    info: { 
       title: 'Market API',
       version: '1.0.0',
       description:
@@ -19,6 +20,10 @@ const options = {
         url: 'https://opensource.org/licenses/MIT',
       },
     },
+    servers: [
+      // { url: 'https://market-api.example.com/api/v1' },
+      { url: `http://localhost:${port}/api/v1`, description: 'Local Dev' },
+    ],
     ...components,
   },
   apis: ['./src/routes/*.js', './src/auth/auth.js', './src/index.js'], // files containing @openapi annotations
